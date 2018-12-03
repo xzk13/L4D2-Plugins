@@ -6,6 +6,7 @@
 * 			DDR Khat
 * 			Red Alex
 *
+* Version 1.4.2: 		support l4d2 (sm_l4d_mapchanger.txt)
 * Version 1.4.0:		New plugin and config name sm_l4d_mapchanger (old sm_l4dvs_mapchanger.smx will be automatically deleted)
 *						Hook change gamemode event and autoload mission list for new gamemode on the server
 *						Add support sm_l4dco_mapchanger.txt and sm_l4dvs_mapchanger.txt for coop and versus gamemodes
@@ -32,7 +33,7 @@
 #include <sourcemod>
 #include <colors>
 
-#define Version "1.4.0"
+#define Version "1.4.2"
 #define MAX_ARRAY_LINE 50
 #define MAX_MAPNAME_LEN 64
 #define MAX_CREC_LEN 2
@@ -393,40 +394,11 @@ ClearKV(Handle:kvhandle)
 
 PluginInitialization()
 {
-	decl String:OldPlugin[128];
-	BuildPath(Path_SM, OldPlugin, sizeof(OldPlugin), "plugins/sm_l4dvs_mapchanger.smx");
-	if(FileExists(OldPlugin))
-	{
-		ServerCommand("sm plugins unload sm_l4dvs_mapchanger");
-		DeleteFile(OldPlugin);
-		PrintToServer("[FMC] Old sm_l4dvs_mapchanger has been unload and deleted.");
-	}
 
 	ClearKV(hKVSettings);
-	/*
-	new GameMode = l4d_gamemode();
-	if (GameMode == 1)
-	{
-		BuildPath(Path_SM, FMC_FileSettings, 128, "data/sm_l4dco_mapchanger.txt");
-		PrintToServer("[FMC] Discovered coop gamemode. Link to sm_l4dco_mapchanger.");
-	}
-	else if (GameMode == 2)
-	{
-		BuildPath(Path_SM, FMC_FileSettings, 128, "data/sm_l4dvs_mapchanger.txt");
-		PrintToServer("[FMC] Discovered versus gamemode. Link to sm_l4dvs_mapchanger.");
-	}
-	else if (GameMode == 3)
-	{
-		SetConVarInt(Allowed, 0);
-		PrintToServer("[FMC] Discovered survival gamemode. Plugin stop activity. Wait for coop or versus.");
-		return;
-	}
-	else
-		SetFailState("[FMC] Current gamemode dont checked. Shutdown.");
-	*/
 	
-	BuildPath(Path_SM, FMC_FileSettings, 128, "data/sm_l4dvs_mapchanger.txt");
-	PrintToServer("[FMC] Discovered versus gamemode. Link to sm_l4dvs_mapchanger.");
+	BuildPath(Path_SM, FMC_FileSettings, 128, "data/sm_l4d_mapchanger.txt");
+	PrintToServer("[FMC] Discovered versus gamemode. Link to sm_l4d_mapchanger.");
 	
 	if(!FileToKeyValues(hKVSettings, FMC_FileSettings))
 		SetFailState("Force Mission Changer settings not found! Shutdown.");

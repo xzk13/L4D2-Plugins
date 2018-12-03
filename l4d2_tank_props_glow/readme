@@ -1,6 +1,8 @@
 When a Tank punches a Hittable it adds a Glow to the hittable which all infected players can see.
 
+
 -command-
+(l4d2_tank_props_glow.cfg)
 // Three values between 0-255 separated by spaces. RGB Color255 - Red Green Blue.
 // -
 // Default: "255 255 255"

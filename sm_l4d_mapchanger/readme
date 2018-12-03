@@ -1,0 +1,4 @@
+Force change to next mission when current mission end.
+
+-command-
+"sm_l4d_fmc_announce", "1", "Enables next mission to advertise to players."

@@ -3,7 +3,6 @@
 #include <sourcemod>
 #include <sdkhooks>
 #include <sdktools>
-#include <l4d2_direct>
 
 #define HUNTER       3
 #define MAX_HUNTERSOUND         6
@@ -48,11 +47,11 @@ public OnMapStart()
 
 public Action: Event_PlayerSpawn( Handle:event, const String:name[], bool:dontBroadcast )
 {
-    new client = GetClientOfUserId(GetEventInt(event, "userid"));
-    if ( !IS_VALID_INFECTED(client) ) { return Plugin_Continue; }
-    
-    new zClass = GetEntProp(client, Prop_Send, "m_zombieClass");
-    if (zClass == HUNTER)
+	new client = GetClientOfUserId(GetEventInt(event, "userid"));
+	if ( !IS_VALID_INFECTED(client) ) { return Plugin_Continue; }
+	
+	new zClass = GetEntProp(client, Prop_Send, "m_zombieClass");
+	if (zClass == HUNTER)
 	{
 		CreateTimer(2.0, HunterCrouchTracking, client, TIMER_REPEAT);
 	}

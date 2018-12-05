@@ -5,7 +5,6 @@
 #undef REQUIRE_PLUGIN
 
 #pragma semicolon 1
-#define PLUGIN_VERSION "2.4"
 #define MAXENTITIES 2048
 #define GAMEDATA_FILE "staggersolver"
 new Handle:g_hGameConf;
@@ -21,7 +20,7 @@ public Plugin:myinfo =
 	name = "l4d 豬隊友提示",
 	author = "Harry Potter",
 	description = "Show who the god teammate boom the Tank, Tank use which weapon(car,pounch,rock) to kill teammates S.I. and Witch , player open door to stun tank",
-	version = PLUGIN_VERSION,
+	version = "2.5",
 	url = "myself"
 }
 
@@ -104,13 +103,57 @@ public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 		return;
 	}
 	
+	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
+	decl String:weapon[15];
+	GetEventString(event, "weapon", weapon, sizeof(weapon));//殺死人的武器名稱
+	//PrintToChatAll("attacker: %d - victim: %d - weapon:%s",attacker,victim,weapon);
+	if((attacker == 0 || attacker == victim)
+	&& victim != 0 && IsClientConnected(victim) && IsClientInGame(victim) && GetClientTeam(victim) == 3)//特感自殺
+	{
+		decl String:kill_weapon[15];
+		if(StrEqual(kill_weapon,"entityflame")||StrEqual(kill_weapon,"env_fire"))//地圖的自然火
+			kill_weapon = "玩火自焚";
+		else if(StrEqual(weapon,"inferno"))//玩家丟的火
+			return;
+		else if(StrEqual(weapon,"trigger_hurt"))//跳樓 跳海 碰到不知明物體死掉
+			kill_weapon = "自殺";
+		else if(StrEqual(weapon,"prop_physics")||StrEqual(weapon, "prop_car_alarm"))//玩車殺死自己
+			kill_weapon = "玩車自爆";
+		else if(StrEqual(weapon,"pipe_bomb"))//自然的爆炸(土製炸彈 砲彈 瓦斯罐)
+			kill_weapon = "被炸死";
+		else if(StrEqual(weapon,"world"))//玩家使用指令kill 殺死特感
+			return;
+		else//卡住了 由伺服器殺死特感
+			kill_weapon = "自我爆☆殺";	
+			
+		if(GetEntProp(victim, Prop_Send, "m_zombieClass") == 8)//Tank suicide
+		{
+			if(!IsFakeClient(victim))//真人SI player
+				if(StrEqual(weapon,"trigger_hurt"))
+					CPrintToChatAll("{green}[提示] {green}Tank {olive}跳樓/海 {default}了! R.I.P. {red}<%N>",victim);
+				else if(StrEqual(weapon,"pipe_bomb"))
+					CPrintToChatAll("{green}[提示] {green}Tank {default}已達成成就 {olive}被炸死毋湯哦");
+				else
+					CPrintToChatAll("{green}[提示] {green}Tank {olive}%s {default}了.",kill_weapon);
+			else
+				CPrintToChatAll("{green}[提示] {green}Tank {olive}%s {default}了.",kill_weapon);
+		}
+		else if(GetEntProp(victim, Prop_Send, "m_zombieClass") != 2)
+		{
+			if(!IsFakeClient(victim))//真人SI player
+				CPrintToChatAll("{green}[提示] {red}%N{default} {olive}%s {default}了.",victim,kill_weapon);
+			else
+				CPrintToChatAll("{green}[提示] {red}AI{default} {olive}%s {default}了.",kill_weapon);
+		}
+		
+		return;
+	}
+	
 	Tankclient = GetTankClient();
 	if(Tankclient == -1)	return;
 	
-	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-	//if (attacker == 0 ||!IsClientConnected(attacker) || !IsClientInGame(attacker) ) return;
-	decl String:weapon[15];
-	GetEventString(event, "weapon", weapon, sizeof(weapon));//殺死人的武器名稱
+	//decl String:weapon[15];
+	//GetEventString(event, "weapon", weapon, sizeof(weapon));//殺死人的武器名稱
 	decl String:victimname[8];
 	GetEventString(event, "victimname", victimname, sizeof(victimname));
 	if( StrEqual(victimname,"Witch") && PlayerIsTank(attacker) )
@@ -119,14 +162,14 @@ public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 		if(StrEqual(weapon,"tank_claw"))
 			Tank_weapon = "One-Punch";
 		else if(StrEqual(weapon,"tank_rock"))
-			Tank_weapon = "Rock-Stone";
+			Tank_weapon = "玉石俱焚";
 		else if(StrEqual(weapon,"prop_physics"))
 			Tank_weapon = "Car-Flying";
 		
 		if(!IsFakeClient(attacker))//真人Tank player
-			CPrintToChatAll("{green}[提示] Tank {default}uses {olive}%s {default}to terminate {red}妹子{default}.",Tank_weapon);
+			CPrintToChatAll("{green}[提示] Tank {default}使出 {olive}%s {default}星爆氣流斬 {red}妹子{default}.",Tank_weapon);
 		else
-			CPrintToChatAll("{green}[提示] Tank {default}uses {olive}%s {default}to terminate {red}妹子{default}.",Tank_weapon);
+			CPrintToChatAll("{green}[提示] Tank {default}使出 {olive}%s {default}星爆氣流斬 {red}妹子{default}.",Tank_weapon);
 		
 		return;
 	}
@@ -176,9 +219,7 @@ public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 			}
 		}
 		else if(attacker == 0 && victimzombieclass == 2)//boomer suicide
-		{
-			CreateTimer(0.2, Timer_BoomerSuicideCheck, victim);//boomer suicide check	
-		}
+				CreateTimer(0.2, Timer_BoomerSuicideCheck, victim);//boomer suicide check	
 	}
 }
 public Action:Timer_SurKillBoomerCheck(Handle:timer, any:client)
@@ -243,9 +284,9 @@ public Action:Timer_BoomerSuicideCheck(Handle:timer, any:client)
 	else
 	{
 		if(!IsFakeClient(client))//真人boomer player
-			CPrintToChatAll("{green}[提示] {red}%N{default}'s 肥宅 爆炸了.",client);
+			CPrintToChatAll("{green}[提示] {red}%N{default}'s 肥宅 自爆了.",client);
 		else
-			CPrintToChatAll("{green}[提示] {red}AI {default}肥宅 爆炸了.");
+			CPrintToChatAll("{green}[提示] {red}AI {default}肥宅 自爆了.");
 	}
 }
 

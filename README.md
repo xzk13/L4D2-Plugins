@@ -3,7 +3,7 @@ L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun p
 
 (All plugins in here only apply to L4D2) 
 
-last edited:2018/12/4
+last edited:2018/12/6
 # Require
 * <b>colors.inc</b>: https://forums.alliedmods.net/showthread.php?t=96831
 # Plugins

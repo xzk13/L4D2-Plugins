@@ -106,7 +106,9 @@ public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
 	decl String:weapon[15];
 	GetEventString(event, "weapon", weapon, sizeof(weapon));//殺死人的武器名稱
-	//PrintToChatAll("attacker: %d - victim: %d - weapon:%s",attacker,victim,weapon);
+	decl String:victimname[8];
+	GetEventString(event, "victimname", victimname, sizeof(victimname));
+	//PrintToChatAll("attacker: %d - victim: %d - weapon:%s - victimname:%s",attacker,victim,weapon,victimname);
 	if((attacker == 0 || attacker == victim)
 	&& victim != 0 && IsClientConnected(victim) && IsClientInGame(victim) && GetClientTeam(victim) == 3)//特感自殺
 	{
@@ -119,21 +121,16 @@ public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 			kill_weapon = "自殺";
 		else if(StrEqual(weapon,"prop_physics")||StrEqual(weapon, "prop_car_alarm"))//玩車殺死自己
 			kill_weapon = "玩車自爆";
-		else if(StrEqual(weapon,"pipe_bomb"))//自然的爆炸(土製炸彈 砲彈 瓦斯罐)
+		else if(StrEqual(weapon,"pipe_bomb")||StrEqual(weapon,"prop_fuel_barr"))//自然的爆炸(土製炸彈 砲彈 瓦斯罐)
 			kill_weapon = "被炸死";
 		else if(StrEqual(weapon,"world"))//玩家使用指令kill 殺死特感
 			return;
-		else kill_weapon = "自我爆☆殺";	//卡住了 由伺服器殺死特感
+		else kill_weapon = "自我爆☆殺";//卡住了 由伺服器自動處死特感
 			
 		if(GetEntProp(victim, Prop_Send, "m_zombieClass") == 8)//Tank suicide
 		{
 			if(!IsFakeClient(victim))//真人SI player
-				if(StrEqual(weapon,"trigger_hurt"))
-					CPrintToChatAll("{green}[提示] {green}Tank {olive}跳樓/海 {default}了! R.I.P. {red}<%N>",victim);
-				else if(StrEqual(weapon,"pipe_bomb"))
-					CPrintToChatAll("{green}[提示] {green}Tank {default}已達成成就 {olive}被炸死毋湯哦");
-				else
-					CPrintToChatAll("{green}[提示] {green}Tank {olive}%s {default}了.",kill_weapon);
+				CPrintToChatAll("{green}[提示] {green}Tank {olive}%s {default}了.",kill_weapon);
 			else
 				CPrintToChatAll("{green}[提示] {green}Tank {olive}%s {default}了.",kill_weapon);
 		}
@@ -147,14 +144,14 @@ public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 	
 		return;
 	}
+	else if (attacker==0 && victim == 0 && StrEqual(victimname,"Witch"))
+	{
+		CPrintToChatAll("{green}[提示] {red}妹子{default} {olive}歸天 {default}了.");
+	}
 	
 	Tankclient = GetTankClient();
 	if(Tankclient == -1)	return;
 	
-	//decl String:weapon[15];
-	//GetEventString(event, "weapon", weapon, sizeof(weapon));//殺死人的武器名稱
-	decl String:victimname[8];
-	GetEventString(event, "victimname", victimname, sizeof(victimname));
 	if( StrEqual(victimname,"Witch") && PlayerIsTank(attacker) )
 	{
 		decl String:Tank_weapon[15];
@@ -266,25 +263,33 @@ public Action:Timer_TankKillBoomerCheck(Handle:timer, Handle:h_Pack)
 
 public Action:Timer_BoomerSuicideCheck(Handle:timer, any:client)
 {	
-	Tankclient = GetTankClient();
-	if(Tankclient<0 || !IsClientConnected(Tankclient) ||!IsClientInGame(Tankclient)) return;
 	if(client<0 || !IsClientConnected(client) ||!IsClientInGame(client)) return;
+	
+	Tankclient = GetTankClient();
+	if(Tankclient<0 || !IsClientConnected(Tankclient) ||!IsClientInGame(Tankclient))
+	{
+		if(!IsFakeClient(client))//真人boomer player
+			CPrintToChatAll("{green}[提示] {red}%N{default}'s 肥宅 爆炸了.",client);
+		else
+			CPrintToChatAll("{green}[提示] {red}AI {default}肥宅 爆炸了.");
+		return;
+	}
 	
 	if (SDKCall(g_hIsStaggering, Tankclient) && !surkillboomerboomtank && !tankstumblebydoor && !tankkillboomerboomhimself && !boomerboomtank)//tank在暈眩
 	{
 		if(!IsFakeClient(client))//真人boomer player
 			CPrintToChatAll("{green}[提示] {default}神隊友 {red}%N{default}'s 肥宅 炸暈 {green}Tank{default}.",client);
 		else
-			CPrintToChatAll("{green}[提示] {default}{red}AI's{default}肥宅 炸暈 {green}Tank{default}.");
+			CPrintToChatAll("{green}[提示] {default}神{red}AI {default}肥宅 炸暈 {green}Tank{default}.");
 		boomerboomtank = true;
 		CreateTimer(3.0,COLD_DOWN,_);
 	}
 	else
 	{
 		if(!IsFakeClient(client))//真人boomer player
-			CPrintToChatAll("{green}[提示] {red}%N{default}'s 肥宅 自爆了.",client);
+			CPrintToChatAll("{green}[提示] {red}%N{default}'s 肥宅 爆炸了.",client);
 		else
-			CPrintToChatAll("{green}[提示] {red}AI {default}肥宅 自爆了.");
+			CPrintToChatAll("{green}[提示] {red}AI {default}肥宅 爆炸了.");
 	}
 }
 
@@ -316,6 +321,7 @@ public Event_WitchKilled(Handle:event, const String:name[], bool:dontBroadcast)
 	g_bIsWitch[GetEventInt(event, "witchid")] = false;
 	
 }
+
 public Event_WitchSpawn(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	g_bIsWitch[GetEventInt(event, "witchid")] = true;

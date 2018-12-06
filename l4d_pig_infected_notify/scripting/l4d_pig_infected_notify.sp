@@ -111,7 +111,7 @@ public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 	&& victim != 0 && IsClientConnected(victim) && IsClientInGame(victim) && GetClientTeam(victim) == 3)//特感自殺
 	{
 		decl String:kill_weapon[15];
-		if(StrEqual(kill_weapon,"entityflame")||StrEqual(kill_weapon,"env_fire"))//地圖的自然火
+		if(StrEqual(weapon,"entityflame")||StrEqual(weapon,"env_fire"))//地圖的自然火
 			kill_weapon = "玩火自焚";
 		else if(StrEqual(weapon,"inferno"))//玩家丟的火
 			return;
@@ -123,8 +123,7 @@ public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 			kill_weapon = "被炸死";
 		else if(StrEqual(weapon,"world"))//玩家使用指令kill 殺死特感
 			return;
-		else//卡住了 由伺服器殺死特感
-			kill_weapon = "自我爆☆殺";	
+		else kill_weapon = "自我爆☆殺";	//卡住了 由伺服器殺死特感
 			
 		if(GetEntProp(victim, Prop_Send, "m_zombieClass") == 8)//Tank suicide
 		{
@@ -138,14 +137,14 @@ public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 			else
 				CPrintToChatAll("{green}[提示] {green}Tank {olive}%s {default}了.",kill_weapon);
 		}
-		else if(GetEntProp(victim, Prop_Send, "m_zombieClass") != 2)
-		{
+		else if(GetEntProp(victim, Prop_Send, "m_zombieClass") == 2)
+			CreateTimer(0.2, Timer_BoomerSuicideCheck, victim);//boomer suicide check	
+		else
 			if(!IsFakeClient(victim))//真人SI player
 				CPrintToChatAll("{green}[提示] {red}%N{default} {olive}%s {default}了.",victim,kill_weapon);
 			else
 				CPrintToChatAll("{green}[提示] {red}AI{default} {olive}%s {default}了.",kill_weapon);
-		}
-		
+	
 		return;
 	}
 	
@@ -218,8 +217,6 @@ public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 				}
 			}
 		}
-		else if(attacker == 0 && victimzombieclass == 2)//boomer suicide
-				CreateTimer(0.2, Timer_BoomerSuicideCheck, victim);//boomer suicide check	
 	}
 }
 public Action:Timer_SurKillBoomerCheck(Handle:timer, any:client)
@@ -269,6 +266,7 @@ public Action:Timer_TankKillBoomerCheck(Handle:timer, Handle:h_Pack)
 
 public Action:Timer_BoomerSuicideCheck(Handle:timer, any:client)
 {	
+	Tankclient = GetTankClient();
 	if(Tankclient<0 || !IsClientConnected(Tankclient) ||!IsClientInGame(Tankclient)) return;
 	if(client<0 || !IsClientConnected(client) ||!IsClientInGame(client)) return;
 	
@@ -277,7 +275,7 @@ public Action:Timer_BoomerSuicideCheck(Handle:timer, any:client)
 		if(!IsFakeClient(client))//真人boomer player
 			CPrintToChatAll("{green}[提示] {default}神隊友 {red}%N{default}'s 肥宅 炸暈 {green}Tank{default}.",client);
 		else
-			CPrintToChatAll("{green}[提示] {default}神{red}AI {default}肥宅 炸暈 {green}Tank{default}.");
+			CPrintToChatAll("{green}[提示] {default}{red}AI's{default}肥宅 炸暈 {green}Tank{default}.");
 		boomerboomtank = true;
 		CreateTimer(3.0,COLD_DOWN,_);
 	}

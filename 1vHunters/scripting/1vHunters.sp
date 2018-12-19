@@ -148,16 +148,12 @@ public Action:OnTakeDamage(victim, &attacker, &inflictor, &Float:damage, &damage
 					if(!IsFakeClient(attacker))
 						CPrintToChat(attacker,"[{olive}TS 1vHunter{default}] You have {green}%d{default} health remaining!", remaining_health);
 				}
-
-				CreateTimer(0.01, ColdDown, attacker,_);
-			  
-				if(CvarSkipGetUpAnimation == 1)
-					CreateTimer(0.1, CancelGetup, victim,_);
 				
-				if (remaining_health == 1&&CvarAnnounce == 1)
-				{
-					CPrintToChat(victim, "[{olive}TS 1vHunter{default}] You don't have to be mad...");
-				}
+				new Handle:pack;
+				CreateDataTimer(0.01, ColdDown, pack,_);
+				WritePackCell(pack, attacker);
+				WritePackCell(pack, victim);
+				WritePackCell(pack, remaining_health);
 			}
 			else if(CvarHunterClawDamage >= 0)
 			{
@@ -180,8 +176,21 @@ public OnClientDisconnect(client)
     SDKUnhook(client, SDKHook_OnTakeDamage, OnTakeDamage);
 }
 
-public Action:ColdDown(Handle:timer, any:client) {
-  ForcePlayerSuicide(client);    
+public Action:ColdDown(Handle:timer, Handle:pack) {
+	ResetPack(pack);
+	new attacker = ReadPackCell(pack);
+
+	ForcePlayerSuicide(attacker);   
+	
+	new victim = ReadPackCell(pack);
+	if(CvarSkipGetUpAnimation == 1)
+		CreateTimer(0.04, CancelGetup, victim,_);
+
+	new remaining_health = ReadPackCell(pack);
+	if (remaining_health == 1&&CvarAnnounce == 1)
+	{
+		CPrintToChat(victim, "[{olive}TS 1vHunter{default}] You don't have to be mad...");
+	}	
 }
 
 public Action:CancelGetup(Handle:timer, any:client) {

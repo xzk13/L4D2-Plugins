@@ -137,7 +137,7 @@ public Action:OnTakeDamage(victim, &attacker, &inflictor, &Float:damage, &damage
 	
 	if (GetClientTeam(victim) == 2 && GetClientTeam(attacker) == 3 && zombie_class == 3)
 	{
-		if(StrEqual(sdamagetype, "prop_physics"))
+		if(!StrEqual(sdamagetype, "player"))
 		{
 			if(damage >= CvarDmgThreshold)
 			{

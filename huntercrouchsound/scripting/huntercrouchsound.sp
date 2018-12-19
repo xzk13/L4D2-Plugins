@@ -36,7 +36,7 @@ public Plugin:myinfo =
     name = "Hunter Crouch Sounds",
     author = "High Cookie & Harry",
     description = "Forces silent but crouched hunters to emitt sounds",
-    version = "1.2",
+    version = "1.4",
     url = ""
 };
 

@@ -149,10 +149,10 @@ public Action:OnTakeDamage(victim, &attacker, &inflictor, &Float:damage, &damage
 						CPrintToChat(attacker,"[{olive}TS 1vHunter{default}] You have {green}%d{default} health remaining!", remaining_health);
 				}
 
-				CreateTimer(0.04, ColdDown, attacker,_);
+				CreateTimer(0.01, ColdDown, attacker,_);
 			  
 				if(CvarSkipGetUpAnimation == 1)
-					CreateTimer(0.05, CancelGetup, victim,_);
+					CreateTimer(0.1, CancelGetup, victim,_);
 				
 				if (remaining_health == 1&&CvarAnnounce == 1)
 				{

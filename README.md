@@ -7,7 +7,6 @@ L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun p
 * <b>hunter_growl_sound_fix</b>: Fix silence Hunter produces growl sound when player MIC on
 * <b>huntercrouchsound</b>: Forces silent but crouched hunters to emitt sounds
 * <b>l4d_pig_infected_notify</b>: Show who the god teammate boom the Tank, Tank use which weapon(car,pounch,rock) to kill teammates S.I. and Witch , player open door to stun tank
-* <b>1vHunters</b>: Hunter pounce survivors and die ,set hunter scratch damage, no getup animation
 # Scripting Compiler
 using sourcemod 1.8 Compiler
 * <b>[colors.inc](https://forums.alliedmods.net/showthread.php?t=96831)</b>

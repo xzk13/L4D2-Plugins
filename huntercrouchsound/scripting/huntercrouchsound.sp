@@ -28,15 +28,13 @@ new bool:isHunter[MAXPLAYERS+1];
 static					g_iOffsetFallVelocity					= -1;
 static	const	String:	CLASSNAME_TERRORPLAYER[] 				= "CTerrorPlayer";
 static	const	String:	NETPROP_FALLVELOCITY[]					= "m_flFallVelocity";
-new bool:haspounced[MAXPLAYERS + 1] = {false};
-new pouncedvictim[MAXPLAYERS + 1] = {0};
 
 public Plugin:myinfo = 
 {
     name = "Hunter Crouch Sounds",
     author = "High Cookie & Harry",
     description = "Forces silent but crouched hunters to emitt sounds",
-    version = "1.4",
+    version = "1.3",
     url = ""
 };
 
@@ -45,8 +43,6 @@ public OnPluginStart()
    HookEvent("player_spawn",Event_PlayerSpawn,              EventHookMode_Post);
    HookEvent("player_death", Event_PlayerDeath);
    HookEvent("round_start", event_RoundStart);
-   HookEvent("lunge_pounce", PlayerLunge_Pounce_Event);
-   HookEvent("pounce_stopped", PlayerLunge_Pounce_Stop_Event);
    g_iOffsetFallVelocity = FindSendPropInfo(CLASSNAME_TERRORPLAYER, NETPROP_FALLVELOCITY);
    if (g_iOffsetFallVelocity <= 0) ThrowError("Unable to find fall velocity offset!");
 }
@@ -60,41 +56,13 @@ public OnMapStart()
     }
 }
 
-public Action:PlayerLunge_Pounce_Event(Handle:event, const String:name[], bool:dontBroadcast)
-{
-	new client = GetClientOfUserId(GetEventInt(event, "userid"));
-	new victim = GetClientOfUserId(GetEventInt(event, "victim"));
-	if(IsClientAndInGame(client)&&GetClientTeam(client) == 3 && GetEntProp(client, Prop_Send, "m_zombieClass") == HUNTER)
-	{
-		haspounced[client] = true;
-		pouncedvictim[client] = victim;
-	}
-}
 
-public Action:PlayerLunge_Pounce_Stop_Event(Handle:event, const String:name[], bool:dontBroadcast)
-{
-	new victim = GetClientOfUserId(GetEventInt(event, "victim"));
-	if(IsClientAndInGame(victim)&&GetClientTeam(victim) == 2)
-	{
-		for (new i = 1; i <= MaxClients; i++) //clear 
-		{
-			if(pouncedvictim[i] == victim)
-			{
-				haspounced[i] = false;
-				pouncedvictim[i] = 0;
-				break;
-			}
-		}
-	}
-}
 public Action:event_RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new i;
 	for(i=0;i<=MAXPLAYERS;++i)
 	{
 		isHunter[i] = false;
-		haspounced[i] = false;
-		pouncedvictim[i] = 0;
 	}
 }
 
@@ -106,7 +74,6 @@ public Action: Event_PlayerSpawn( Handle:event, const String:name[], bool:dontBr
     new zClass = GetEntProp(client, Prop_Send, "m_zombieClass");
     if (zClass == HUNTER)
 	{
-		haspounced[client] = false;
 		isHunter[client] = true;
 		CreateTimer(HUNTERCROUCHTRACKING_TIMER, HunterCrouchTracking, client, TIMER_REPEAT);
 	}
@@ -163,12 +130,21 @@ public Action:Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroa
 	new victim = GetEventInt(event, "userid");
 	new client = GetClientOfUserId(victim);
 	isHunter[client] = false;
-	haspounced[client] = false;
 }
 
 bool:HasTarget(hunter)
 {
-	return (haspounced[hunter]);
+	new hasvictim = GetEntPropEnt(hunter, Prop_Send, "m_pounceVictim");
+	if(IsSurvivors(hasvictim)) //已經撲人
+	{
+		return true;
+	}
+	return false;
+}
+
+stock bool:IsSurvivors(client)
+{
+	return IsClientAndInGame(client) && GetClientTeam(client) == 2;
 }
 
 stock bool:IsClientAndInGame(index)

@@ -9,5 +9,5 @@ L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun p
 * <b>l4d2_ai_damagefix</b>: Makes AI SI take (and do) damage like human SI.
 * <b>l4d_tanklimit</b>: limit tank in server
 # Scripting Compiler
-using sourcemod 1.8 Compiler
+most of source codes using [sourcemod 1.63](http://sourcemod.otstrel.ru) Compiler, some source codes need [sourcemod 1.9](https://www.sourcemod.net/downloads.php?branch=1.9-dev) if you want to edit code and recomplie
 * <b>[colors.inc](https://forums.alliedmods.net/showthread.php?t=96831)</b>

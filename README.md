@@ -15,3 +15,7 @@ L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun p
 # Scripting Compiler
 most of source codes using [sourcemod 1.63](http://sourcemod.otstrel.ru) Compiler, some source codes need [sourcemod 1.9](https://www.sourcemod.net/downloads.php?branch=1.9-dev) if you want to edit code and recomplie
 * <b>[colors.inc](https://forums.alliedmods.net/showthread.php?t=96831)</b>
+# Others
+* <b>[L4D1-Competitive-Plugins](https://github.com/fbef0102/L4D1-Competitive-Plugins)</b>: L4D1 Competitive enhancement
+* <b>[L4D1_2-Plugins](https://github.com/fbef0102/L4D1_2-Plugins)</b>: L4D1/2 general purpose and freaky-fun plugins.
+* <b>[L4D2-Multi-Hunters](https://github.com/fbef0102/L4D2-Multi-Hunters)</b>: Experience multi Hunters hell...

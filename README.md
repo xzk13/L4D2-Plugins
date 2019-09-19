@@ -1,6 +1,10 @@
 # L4D2-Plugins by Harry Potter
 L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun plugins.
 >All plugins in here only apply to L4D2 (last edited:2019/5/7)
+# Require
+* Clean Servers:
+  * [Sourcemod 1.8](https://www.sourcemod.net/downloads.php?branch=1.8-dev) (or newer), [Metamod](https://www.metamodsource.net/downloads.php?branch=stable)
+* <b>[GameRules Prop Hax](https://forums.alliedmods.net/showthread.php?t=154217)</b>
 # Plugins
 * <b>sm_l4d_mapchanger</b>: Force change to next mission when current mission end.
 * <b>l4d2_tank_props_glow</b>: When a Tank punches a Hittable it adds a Glow to the hittable which all infected players can see.

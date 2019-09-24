@@ -141,12 +141,21 @@ public void OnPluginStart()
 	HookConVarChange(hMangumTimeCvar, ConVarChange_hMangumTimeCvar);
 	
 	HookEvent("weapon_reload", OnWeaponReload_Event, EventHookMode_Post);
+	HookEvent("round_start", RoundStart_Event);
 	
 	ammoOffset = FindSendPropInfo("CCSPlayer", "m_iAmmo");
 	
 	SetWeapon();
 	
 	AutoExecConfig(true, "l4d2_weapon_csgo_reload");
+}
+
+public Action:RoundStart_Event(Handle:event, const String:name[], bool:dontBroadcast)
+{
+	for(new i = 1; i <= MaxClients; i++)
+	{
+		g_hClientReload_Timer[i] = INVALID_HANDLE;
+	}
 }
 
 public void SetWeapon()

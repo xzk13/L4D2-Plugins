@@ -2,3 +2,13 @@ Force change to next mission when current mission end.
 
 -command-
 "sm_l4d_fmc_announce", "1", "Enables next mission to advertise to players."
+"sm_l4d_fmc_version", "Version of L4D Force Mission Changer plugin."
+"sm_l4d_fmc_dbug", "0", "on-off Write event to log file."
+"sm_l4d_fmc", "1", "Enables Force changelevel when mission end."
+"sm_l4d_fmc_ifdie", "0", "Enables Force changelevel when all player die on final map in coop gamemode."
+"sm_l4d_fmc_def", "c2m1_highway", "Mission for change by default."
+"sm_l4d_fmc_crec", "3", "Quantity of events RoundEnd before force of changelevel in versus: 4 for l4d <> 1.0.1.2"
+"sm_l4d_fmc_chdelayvs", "1.0", "Delay before versus mission change (float in sec)."
+"sm_l4d_fmc_chdelaycoop", "6.0", "Delay before coop mission change (float in sec)."
+"sm_l4d_fmc_announce", "1", "Enables next mission to advertise to players."
+	

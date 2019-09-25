@@ -33,7 +33,7 @@
 #include <sourcemod>
 #include <colors>
 
-#define Version "1.4.2"
+#define Version "1.6"
 #define MAX_ARRAY_LINE 50
 #define MAX_MAPNAME_LEN 64
 #define MAX_CREC_LEN 2
@@ -41,17 +41,14 @@
 
 new Handle:cvarAnnounce = INVALID_HANDLE;
 new Handle:Allowed = INVALID_HANDLE;
-//new Handle:AllowedDie = INVALID_HANDLE;
+new Handle:AllowedDie = INVALID_HANDLE;
 new Handle:DebugEvent = INVALID_HANDLE;
 new Handle:DefM;
 new Handle:CheckRoundCounter;
 new Handle:ChDelayVS;
-//new Handle:ChDelayCOOP;
-new Handle:TimerRoundEndBlockVS;
+new Handle:ChDelayCOOP;
 
 new Handle:hKVSettings = INVALID_HANDLE;
-
-//new Handle:CurrentGameMode = INVALID_HANDLE;
 
 new Handle:logfile;
 
@@ -62,14 +59,17 @@ new String:next_mission_def[64];
 new String:next_mission_force[64];
 new String:force_mission_name[64];
 new RoundEndCounter = 0;
-new RoundEndCounterValue = 0;
 new RoundEndBlock = 0;
 new Float:RoundEndBlockValue = 0.0;
+new CoopRoundEndCounter = 0;
+new CoopRoundEndCounterValue = 0;
 
 new String:MapNameArrayLine[MAX_ARRAY_LINE][MAX_MAPNAME_LEN];
 new String:CrecNumArrayLine[MAX_ARRAY_LINE][MAX_CREC_LEN];
 new String:reBlkFlArrayLine[MAX_ARRAY_LINE][MAX_REBFl_LEN];
 new g_ArrayCount = 0;
+new Handle:h_GameMode;
+new String:GameName[16];
 
 public Plugin:myinfo = 
 {
@@ -82,6 +82,10 @@ public Plugin:myinfo =
 
 public OnPluginStart()
 {
+	h_GameMode = FindConVar("mp_gamemode");
+	GetConVarString(h_GameMode, GameName, sizeof(GameName));
+	HookConVarChange(h_GameMode, ConVarGameMode);
+	
 	decl String:ModName[50];
 	GetGameFolderName(ModName, sizeof(ModName));
 
@@ -90,37 +94,37 @@ public OnPluginStart()
 
 	hKVSettings=CreateKeyValues("ForceMissionChangerSettings");
 
+	HookEvent("round_start", Event_RoundStart);
 	HookEvent("round_end", Event_RoundEnd);
-	//HookEvent("finale_win", Event_FinalWin);
-	//HookEvent("mission_lost", Event_FinalLost);
+	HookEvent("finale_win", Event_FinalWin);
+	HookEvent("mission_lost", Event_FinalLost);
 	
 	CreateConVar("sm_l4d_fmc_version", Version, "Version of L4D Force Mission Changer plugin.", FCVAR_NOTIFY);
 	DebugEvent = CreateConVar("sm_l4d_fmc_dbug", "0", "on-off Write event to log file.");
 	Allowed = CreateConVar("sm_l4d_fmc", "1", "Enables Force changelevel when mission end.");
-	//AllowedDie = CreateConVar("sm_l4d_fmc_ifdie", "1", "Enables Force changelevel when all player die on final map in coop gamemode.");
-	DefM = CreateConVar("sm_l4d_fmc_def", "l4d_vs_hospital01_apartment", "Mission for change by default.");
-	CheckRoundCounter = CreateConVar("sm_l4d_fmc_crec", "4", "Quantity of events RoundEnd before force of changelevel in versus: 4 for l4d <> 1.0.1.2");
-	ChDelayVS = CreateConVar("sm_l4d_fmc_chdelayvs", "0.0", "Delay before versus mission change (float in sec).");
-	//ChDelayCOOP = CreateConVar("sm_l4d_fmc_chdelaycoop", "0.0", "Delay before coop mission change (float in sec).");
-	TimerRoundEndBlockVS = CreateConVar("sm_l4d_fmc_re_timer_block", "0.5", "Time in which current event round_end is not considered (float in sec).");
+	AllowedDie = CreateConVar("sm_l4d_fmc_ifdie", "0", "Enables Force changelevel when all player die on final map in coop gamemode.");
+	DefM = CreateConVar("sm_l4d_fmc_def", "c2m1_highway", "Mission for change by default.");
+	CheckRoundCounter = CreateConVar("sm_l4d_fmc_crec", "3", "Quantity of events RoundEnd before force of changelevel in coop");
+	ChDelayVS = CreateConVar("sm_l4d_fmc_chdelayvs", "1.0", "Delay before versus mission change (float in sec).");
+	ChDelayCOOP = CreateConVar("sm_l4d_fmc_chdelaycoop", "6.0", "Delay before coop mission change (float in sec).");
 	cvarAnnounce = CreateConVar("sm_l4d_fmc_announce", "1", "Enables next mission to advertise to players.");
 	
 	//For custom crec
 	RegServerCmd("sm_l4d_fmc_crec_add", Command_CrecAdd, "Add custom value sm_l4d_fmc_crec and sm_l4d_fmc_re_timer_block for the specified map. Max 50.");
 	RegServerCmd("sm_l4d_fmc_crec_clear", Command_CrecClear, "Clear all custom value sm_l4d_fmc_crec and sm_l4d_fmc_re_timer_block.");
 	RegServerCmd("sm_l4d_fmc_crec_list", Command_CrecList, "Show all custom value sm_l4d_fmc_crec and sm_l4d_fmc_re_timer_block.");
-	
-	//CurrentGameMode = FindConVar("sm_cvar mp_gamemode");
-	//HookConVarChange(CurrentGameMode, OnCVGameModeChange);
 
 	logfile = OpenFile("/addons/sourcemod/logs/fmc_event.log", "w");
 }
-
+public ConVarGameMode(ConVar cvar, const char[] sOldValue, const char[] sNewValue)
+{
+	GetConVarString(h_GameMode, GameName, sizeof(GameName));
+}
 public OnMapStart()
 {
-	// Execute the config file
 	AutoExecConfig(true, "sm_l4d_mapchanger");
 	
+	CoopRoundEndCounter = 0;
 	RoundEndCounter = 0;
 	RoundEndBlock = 0;
 
@@ -133,9 +137,9 @@ public OnMapStart()
 		
 		if (GetConVarInt(DebugEvent) == 1)
 		{
-			PrintToChatAll("\x04[FMC DEBUG]\x03 MapStart: RECV: \"%d\" REBV: \"%d\"", RoundEndCounterValue, RoundEndBlockValue);
+			PrintToChatAll("\x04[FMC DEBUG]\x03 MapStart: RECV: \"%d\" REBV: \"%d\"", CoopRoundEndCounterValue, RoundEndBlockValue);
 			decl String:mBuffer[128];
-			Format(mBuffer, sizeof(mBuffer), "MapStart: RECV: \"%d\" REBV: \"%d\"", RoundEndCounterValue, RoundEndBlockValue);
+			Format(mBuffer, sizeof(mBuffer), "MapStart: RECV: \"%d\" REBV: \"%d\"", CoopRoundEndCounterValue, RoundEndBlockValue);
 			WriteFileLine(logfile, mBuffer);
 		}
 	}
@@ -155,7 +159,7 @@ public OnClientPutInServer(client)
 {
 	// Make the announcement in 20 seconds unless announcements are turned off
 	if(client && !IsFakeClient(client) && GetConVarBool(cvarAnnounce))
-		CreateTimer(20.0, TimerAnnounce, client);
+		CreateTimer(15.0, TimerAnnounce, client);
 }
 
 public OnClientDisconnect(client)
@@ -167,14 +171,33 @@ public OnClientDisconnect(client)
 		if (StrEqual(next_mission_force, "none") == true) EmptyServerMap = next_mission_def;
 		else EmptyServerMap = next_mission_force;
 
-		/*if (GetConVarInt(DebugEvent) == 1)
+		if (GetConVarInt(DebugEvent) == 1)
 		{
 			decl String:mBuffer[128];
-			Format(mBuffer, sizeof(mBuffer), "MODE: \"%d\" MAP: \"%s\" EVENT: changemission to \"%s\" REASON: Server is empty", l4d_gamemode(), current_map, EmptyServerMap);
+			Format(mBuffer, sizeof(mBuffer), "MAP: \"%s\" EVENT: changemission to \"%s\" REASON: Server is empty", current_map, EmptyServerMap);
 			WriteFileLine(logfile, mBuffer);
-		}*/
+		}
 
 		ServerCommand("changelevel %s", EmptyServerMap);
+	}
+}
+
+public Action:Event_RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
+{
+	if (GetConVarInt(DebugEvent) == 1)
+	{
+		PrintToChatAll("\x04[FMC DEBUG]\x03 EVENT: \"%s\" NUM: \"%d\" Max: \"%d\"", name, CoopRoundEndCounter, CoopRoundEndCounterValue);
+	}
+	if(GetConVarInt(Allowed) == 1 && StrEqual(GameName,"coop") && StrEqual(next_mission_force, "none") != true)
+	{
+		if(CoopRoundEndCounterValue > 0 && CoopRoundEndCounter > 0) 
+		{
+			CPrintToChatAll("{default}[{olive}TS{default}]{default} 還剩 {green}%d {default}次機會挑戰 {lightgreen}最後關卡{default}.",CoopRoundEndCounterValue-CoopRoundEndCounter);
+		}
+		if(CoopRoundEndCounterValue-CoopRoundEndCounter == 1)
+		{
+			CPrintToChatAll("下一張圖 Next Map{default}: {blue}%s{default}.", announce_map);
+		}
 	}
 }
 
@@ -184,81 +207,69 @@ public Action:Event_RoundEnd(Handle:event, const String:name[], bool:dontBroadca
 	{
 		RoundEndCounter += 1;
 		RoundEndBlock = 1;
-		CreateTimer(GetConVarFloat(TimerRoundEndBlockVS), TimerRoundEndBlock);
+		CreateTimer(0.5, TimerRoundEndBlock);
 	}
 
-	/*if (GetConVarInt(DebugEvent) == 1)
+	if (GetConVarInt(DebugEvent) == 1)
 	{
 		new winnerteam = GetEventInt(event, "winner");
 
-		PrintToChatAll("\x04[FMC DEBUG]\x03 MODE: \"%d\" EVENT: \"%s\" NUM: \"%d\" TWIN: \"%d\"", l4d_gamemode(), name, RoundEndCounter, winnerteam);
+		PrintToChatAll("\x04[FMC DEBUG]\x03 EVENT: \"%s\" NUM: \"%d\" TWIN: \"%d\"", name, RoundEndCounter, winnerteam);
 		decl String:mBuffer[128];
-		Format(mBuffer, sizeof(mBuffer), "MODE: \"%d\" MAP: \"%s\" EVENT: \"%s\" NUM: \"%d\" TWIN: \"%d\"", l4d_gamemode(), current_map, name, RoundEndCounter, winnerteam);
+		Format(mBuffer, sizeof(mBuffer), "MAP: \"%s\" EVENT: \"%s\" NUM: \"%d\" TWIN: \"%d\"", current_map, name, RoundEndCounter, winnerteam);
 		WriteFileLine(logfile, mBuffer);
-	}*/
+	}
 	
-	//if(GetConVarInt(Allowed) == 1 && l4d_gamemode() == 2 && StrEqual(next_mission_force, "none") != true && GetConVarInt(CheckRoundCounter) != 0 && RoundEndCounter >= RoundEndCounterValue)
-	if(GetConVarInt(Allowed) == 1 && StrEqual(next_mission_force, "none") != true && GetConVarInt(CheckRoundCounter) != 0 && RoundEndCounter >= RoundEndCounterValue)
+
+	if(GetConVarInt(Allowed) == 1 && StrEqual(GameName,"versus") && StrEqual(next_mission_force, "none") != true && GetConVarInt(CheckRoundCounter) != 0 && RoundEndCounter >= 4)
 	{
-		/*if (GetConVarInt(DebugEvent) == 1)
+		if (GetConVarInt(DebugEvent) == 1)
 		{
-			PrintToChatAll("\x04[FMC DEBUG]\x03 MODE: \"%d\" EVENT: START FMC TIMER ", l4d_gamemode());
+			PrintToChatAll("\x04[FMC DEBUG]\x03 EVENT: START FMC TIMER ");
 			decl String:mBuffer[128];
-			Format(mBuffer, sizeof(mBuffer), "MODE: \"%d\" MAP: \"%s\" EVENT: START FMC TIMER ", l4d_gamemode(), current_map);
+			Format(mBuffer, sizeof(mBuffer), "MAP: \"%s\" EVENT: START FMC TIMER ", current_map);
 			WriteFileLine(logfile, mBuffer);
-		}*/
+		}
 
 		CreateTimer(RoundEndBlockValue, TimerChDelayVS);
 		RoundEndCounter = 0;
 	}
 }
 
-/*
+
 public Action:Event_FinalWin(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	if (GetConVarInt(DebugEvent) == 1)
 	{
-		PrintToChatAll("\x04[FMC DEBUG]\x03 MODE: \"%d\" EVENT: \"%s\" ", l4d_gamemode(), name);
+		PrintToChatAll("\x04[FMC DEBUG]\x03 EVENT: \"%s\" ", name);
 		decl String:mBuffer[128];
-		Format(mBuffer, sizeof(mBuffer), "MODE: \"%d\" MAP: \"%s\" EVENT: \"%s\" ", l4d_gamemode(), current_map, name);
+		Format(mBuffer, sizeof(mBuffer), "MAP: \"%s\" EVENT: \"%s\" ", current_map, name);
 		WriteFileLine(logfile, mBuffer);
 	}
 
-	if(GetConVarInt(Allowed) == 1 && l4d_gamemode() == 1 && StrEqual(next_mission_force, "none") != true)
+	if(GetConVarInt(Allowed) == 1 && StrEqual(GameName,"coop") && StrEqual(next_mission_force, "none") != true)
 		CreateTimer(GetConVarFloat(ChDelayCOOP), TimerChDelayCOOP);
-}*/
-/*
+}
+
 public Action:Event_FinalLost(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	if (GetConVarInt(DebugEvent) == 1)
 	{
-		PrintToChatAll("\x04[FMC DEBUG]\x03 MODE: \"%d\" EVENT: \"%s\" ", l4d_gamemode(), name);
+		PrintToChatAll("\x04[FMC DEBUG]\x03 EVENT: \"%s\" ", name);
 		decl String:mBuffer[128];
-		Format(mBuffer, sizeof(mBuffer), "MODE: \"%d\" MAP: \"%s\" EVENT: \"%s\" ", l4d_gamemode(), current_map, name);
+		Format(mBuffer, sizeof(mBuffer), "MAP: \"%s\" EVENT: \"%s\" ", current_map, name);
 		WriteFileLine(logfile, mBuffer);
 	}
 
-	if(GetConVarInt(Allowed) == 1 && GetConVarInt(AllowedDie) && l4d_gamemode() == 1 && StrEqual(next_mission_force, "none") != true)
-		CreateTimer(GetConVarFloat(ChDelayCOOP), TimerChDelayCOOP);
-}*/
-/*
-public OnCVGameModeChange(Handle:convar, const String:oldValue[], const String:newValue[])
-{
-	//If game mode actually changed
-	if (strcmp(oldValue, newValue) != 0)
+	if(GetConVarInt(Allowed) == 1 && StrEqual(GameName,"coop") && StrEqual(next_mission_force, "none") != true)
 	{
-		new GameMode = l4d_gamemode();
-		if (GameMode == 1 || GameMode == 2 || GameMode == 3)
-		{
-			HookEvent("round_end", Event_RoundEnd);
-			//HookEvent("finale_win", Event_FinalWin);
-			//HookEvent("mission_lost", Event_FinalLost);
-		}
-
-		if(GetConVarInt(Allowed) == 1)
-			PluginInitialization();
+		CoopRoundEndCounter += 1;
+		if(GetConVarInt(AllowedDie) || CoopRoundEndCounter>=CoopRoundEndCounterValue)
+			CreateTimer(GetConVarFloat(ChDelayCOOP), TimerChDelayCOOP);
 	}
-}*/
+		
+	
+}
 
 public Action:TimerAnnounce(Handle:timer, any:client)
 {
@@ -266,11 +277,8 @@ public Action:TimerAnnounce(Handle:timer, any:client)
 	{
 		if (StrEqual(next_mission_force, "none") != true)
 		{
-			CPrintToChat(client, "{default}[{olive}JS{default}]本地圖最終張{default}，{red}若沒要打下一場請跟隊友說{default}，{red}要懂禮貌{default}!");
-			CPrintToChat(client, "{default}[{olive}JS{default}]{default} 下一張圖{default}: {blue}%s{default}.", announce_map);
+			CPrintToChat(client, "{default}[{olive}TS{default}]{default} 下一張圖 Next Map{default}: {blue}%s{default}.", announce_map);
 		}
-		//else
-		//	CPrintToChat(client, "{default}[{olive}JS{default}]{default} 本{green}SV{default}管理員:{blue}JJ{default}、{blue}哈利{default}、{blue}stone{default}、{blue}老爹{default}.");
 	}
 }
 
@@ -281,21 +289,21 @@ public Action:TimerRoundEndBlock(Handle:timer)
 
 public Action:TimerChDelayVS(Handle:timer)
 {
-	/*if (GetConVarInt(DebugEvent) == 1)
+	if (GetConVarInt(DebugEvent) == 1)
 	{
-		PrintToChatAll("\x04[FMC DEBUG]\x03 MODE: \"%d\" EVENT: changemission to \"%s\" ", l4d_gamemode(), next_mission_force);
+		PrintToChatAll("\x04[FMC DEBUG]\x03 EVENT: changemission to \"%s\" ", next_mission_force);
 		decl String:mBuffer[128];
-		Format(mBuffer, sizeof(mBuffer), "MODE: \"%d\" MAP: \"%s\" EVENT: changemission to \"%s\" ", l4d_gamemode(), current_map, next_mission_force);
+		Format(mBuffer, sizeof(mBuffer), "MAP: \"%s\" EVENT: changemission to \"%s\" ", current_map, next_mission_force);
 		WriteFileLine(logfile, mBuffer);
-	}*/
+	}
 
 	ServerCommand("changelevel %s", next_mission_force);
 }
-/*
+
 public Action:TimerChDelayCOOP(Handle:timer)
 {
 	ServerCommand("changelevel %s", next_mission_force);
-}*/
+}
 
 public Action:Command_CrecClear(args)
 {
@@ -352,31 +360,7 @@ public Action:Command_CrecList(args)
 	}
 	PrintToServer("[FMC] Custom value sm_l4d_fmc_crec and sm_l4d_fmc_re_timer_block list end.");
 }
-/*
-l4d_gamemode()
-{
-	// 1 - coop / 2 - versus / 3 - survival / or false (thx DDR Khat for code)
-	new String:gmode[32];
-	GetConVarString(FindConVar("sm_cvar mp_gamemode"), gmode, sizeof(gmode));
 
-	if (strcmp(gmode, "coop") == 0)
-	{
-		return 1;
-	}
-	else if (strcmp(gmode, "versus", false) == 0)
-	{
-		return 2;
-	}
-	else if (strcmp(gmode, "survival", false) == 0)
-	{
-		return 3;
-	}
-	else
-	{
-		return false;
-	}
-}
-*/
 ClearKV(Handle:kvhandle)
 {
 	KvRewind(kvhandle);
@@ -428,19 +412,19 @@ PluginInitialization()
 		else
 			announce_map = next_mission_force;
 				
-		RoundEndCounterValue = 0;
+		CoopRoundEndCounterValue = 0;
 		RoundEndBlockValue = 0.0;
 		for (new i = 0; i < g_ArrayCount; i++)
 		{
 			if (StrEqual(current_map, MapNameArrayLine[i]) == true)
 			{
-				RoundEndCounterValue = StringToInt(CrecNumArrayLine[g_ArrayCount]);
+				CoopRoundEndCounterValue = StringToInt(CrecNumArrayLine[g_ArrayCount]);
 				RoundEndBlockValue = StringToFloat(reBlkFlArrayLine[g_ArrayCount]);
 				break;
 			}
 		}
-		if (RoundEndCounterValue == 0)
-			RoundEndCounterValue = GetConVarInt(CheckRoundCounter);
+		if (CoopRoundEndCounterValue == 0)
+			CoopRoundEndCounterValue = GetConVarInt(CheckRoundCounter);
 		if (RoundEndBlockValue == 0.0)
 			RoundEndBlockValue = GetConVarFloat(ChDelayVS);
 	}

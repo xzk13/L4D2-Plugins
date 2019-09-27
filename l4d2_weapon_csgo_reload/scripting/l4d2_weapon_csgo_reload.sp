@@ -80,7 +80,7 @@ public Plugin:myinfo =
 	name = "L4D2 weapon csgo reload",
 	author = "Harry Potter",
 	description = "reload like csgo weapon",
-	version = "1.2",
+	version = "1.3",
 	url = "Harry Potter myself,you bitch shit"
 };
 
@@ -333,9 +333,8 @@ public Action OnWeaponReload_Event(Handle event, const char[] name, bool dontBro
 	char sWeaponName[32];
 	GetClientWeapon(client, sWeaponName, sizeof(sWeaponName));
 	WeaponID weaponid = GetWeaponID(iCurrentWeapon,sWeaponName);
-	int ammo = GetWeaponAmmo(client, WeaponAmmoOffest[weaponid]);
 	#if DEBUG
-		PrintToChatAll("%N - %s ammo:%d - weaponid: %d",client,sWeaponName,ammo,weaponid);
+		PrintToChatAll("%N - %s - weaponid: %d",client,sWeaponName,weaponid);
 		for (int i = 0; i < 32; i++)
 		{
 			PrintToConsole(client, "Offset: %i - Count: %i", i, GetEntData(client, ammoOffset+(i*4)));
@@ -364,7 +363,6 @@ public Action OnWeaponReload_Event(Handle event, const char[] name, bool dontBro
 	}
 	WritePackCell(pack, client);
 	WritePackCell(pack, iCurrentWeapon);
-	WritePackCell(pack, ammo);
 	WritePackCell(pack, weaponid);
 	WritePackCell(pack, g_hClientReload_Time[client]);
 	
@@ -376,10 +374,9 @@ public Action WeaponReloadClip(Handle timer, Handle pack)
 	ResetPack(pack);
 	int client = ReadPackCell(pack);
 	int CurrentWeapon = ReadPackCell(pack);
-	int ammo = ReadPackCell(pack);
 	WeaponID weaponid = ReadPackCell(pack);
 	float reloadtime = ReadPackCell(pack);
-	int nowsmgclip;
+	int clip;
 	
 	if ( reloadtime != g_hClientReload_Time[client] || //裝彈時間被刷新
 	CurrentWeapon == -1 || //CurrentWeapon drop
@@ -389,13 +386,13 @@ public Action WeaponReloadClip(Handle timer, Handle pack)
 	!IsPlayerAlive(client) ||
 	GetClientTeam(client)!=2 ||
 	GetEntProp(CurrentWeapon, Prop_Send, "m_bInReload") == 0 || //reload interrupted
-	(nowsmgclip = GetWeaponClip(CurrentWeapon)) == WeaponMaxClip[weaponid] //CurrentWeapon complete reload finished
+	(clip = GetWeaponClip(CurrentWeapon)) == WeaponMaxClip[weaponid] //CurrentWeapon complete reload finished
 	)
 	{
 		return Plugin_Handled;
 	}
 	
-	if (nowsmgclip < WeaponMaxClip[weaponid])
+	if (clip < WeaponMaxClip[weaponid])
 	{
 		switch(weaponid)
 		{
@@ -403,12 +400,23 @@ public Action WeaponReloadClip(Handle timer, Handle pack)
 			(WeaponID:ID_AK47),(WeaponID:ID_RIFLE_DESERT),(WeaponID:ID_AWP),(WeaponID:ID_GRENADE),(WeaponID:ID_SCOUT),(WeaponID:ID_SG552),
 			(WeaponID:ID_SNIPER_MILITARY):
 			{
-				ammo -= WeaponMaxClip[weaponid];
 				#if DEBUG
 					PrintToChatAll("CurrentWeapon reload clip completed");
 				#endif
+			
+				int ammo = GetWeaponAmmo(client, WeaponAmmoOffest[weaponid]);
+				if( (ammo - (WeaponMaxClip[weaponid] - clip)) <= 0)
+				{
+					clip = clip + ammo;
+					ammo = 0;
+				}
+				else
+				{
+					ammo = ammo - (WeaponMaxClip[weaponid] - clip);
+					clip = WeaponMaxClip[weaponid];
+				}
 				SetWeaponAmmo(client,WeaponAmmoOffest[weaponid],ammo);
-				SetWeaponClip(CurrentWeapon,WeaponMaxClip[weaponid]);
+				SetWeaponClip(CurrentWeapon,clip);
 			}
 			case (WeaponID:ID_PISTOL),(WeaponID:ID_DUAL_PISTOL),(WeaponID:ID_MAGNUM),(WeaponID:ID_M60):
 			{

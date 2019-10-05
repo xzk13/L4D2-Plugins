@@ -88,12 +88,12 @@ public void OnPluginStart()
 {
 	hEnableReloadClipCvar	= CreateConVar("l4d2_enable_reload_clip", 				"1", 	"enable this plugin?[1-Enable,0-Disable]" , FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	hEnableClipRecoverCvar	= CreateConVar("l4d2_enable_clip_recover", 				"1", 	"enable previous clip recover?"			  , FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	hSmgTimeCvar			= CreateConVar("l4d2_smg_reload_clip_time", 			"1.2", "reload time for smg clip"				  , FCVAR_NOTIFY);
+	hSmgTimeCvar			= CreateConVar("l4d2_smg_reload_clip_time", 			"1.04", "reload time for smg clip"				  , FCVAR_NOTIFY);
 	hRifleTimeCvar			= CreateConVar("l4d2_rifle_reload_clip_time", 			"1.2",  "reload time for rifle clip"			  , FCVAR_NOTIFY);
 	hHuntingRifleTimeCvar   = CreateConVar("l4d2_huntingrifle_reload_clip_time", 	"2.6", "reload time for hunting rifle clip"		  , FCVAR_NOTIFY);
 	hPistolTimeCvar 		= CreateConVar("l4d2_pistol_reload_clip_time", 			"1.2",  "reload time for pistol clip"		      , FCVAR_NOTIFY);
 	hDualPistolTimeCvar 	= CreateConVar("l4d2_dualpistol_reload_clip_time", 		"1.75", "reload time for dual pistol clip"        , FCVAR_NOTIFY);
-	hSmgSilencedTimeCvar	= CreateConVar("l4d2_smgsilenced_reload_clip_time", 	"1.1",  "reload time for smg silenced clip"       , FCVAR_NOTIFY);
+	hSmgSilencedTimeCvar	= CreateConVar("l4d2_smgsilenced_reload_clip_time", 	"1.05",  "reload time for smg silenced clip"       , FCVAR_NOTIFY);
 	hSmgMP5TimeCvar			= CreateConVar("l4d2_smgmp5_reload_clip_time", 			"1.7",  "reload time for smg mp5 clip"      	  , FCVAR_NOTIFY);
 	hAK47TimeCvar			= CreateConVar("l4d2_ak47_reload_clip_time", 			"1.2",  "reload time for ak47 clip"      		  , FCVAR_NOTIFY);
 	hRifleDesertTimeCvar	= CreateConVar("l4d2_rifledesert_reload_clip_time", 	"1.8",  "reload time for rifledesert clip"        , FCVAR_NOTIFY);

@@ -162,26 +162,6 @@ public OnClientPutInServer(client)
 		CreateTimer(15.0, TimerAnnounce, client);
 }
 
-public OnClientDisconnect(client)
-{
-	if (GetClientCount(true) <= 0)
-	{
-		decl String:EmptyServerMap[64];
-
-		if (StrEqual(next_mission_force, "none") == true) EmptyServerMap = next_mission_def;
-		else EmptyServerMap = next_mission_force;
-
-		if (GetConVarInt(DebugEvent) == 1)
-		{
-			decl String:mBuffer[128];
-			Format(mBuffer, sizeof(mBuffer), "MAP: \"%s\" EVENT: changemission to \"%s\" REASON: Server is empty", current_map, EmptyServerMap);
-			WriteFileLine(logfile, mBuffer);
-		}
-
-		ServerCommand("changelevel %s", EmptyServerMap);
-	}
-}
-
 public Action:Event_RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	if (GetConVarInt(DebugEvent) == 1)
@@ -267,8 +247,6 @@ public Action:Event_FinalLost(Handle:event, const String:name[], bool:dontBroadc
 		if(GetConVarInt(AllowedDie) || CoopRoundEndCounter>=CoopRoundEndCounterValue)
 			CreateTimer(GetConVarFloat(ChDelayCOOP), TimerChDelayCOOP);
 	}
-		
-	
 }
 
 public Action:TimerAnnounce(Handle:timer, any:client)

@@ -20,4 +20,3 @@ most of source codes using [sourcemod 1.63](http://sourcemod.otstrel.ru) Compile
 # Others
 * <b>[L4D1-Competitive-Plugins](https://github.com/fbef0102/L4D1-Competitive-Plugins)</b>: L4D1 Competitive enhancement
 * <b>[L4D1_2-Plugins](https://github.com/fbef0102/L4D1_2-Plugins)</b>: L4D1/2 general purpose and freaky-fun plugins.
-* <b>[L4D2-Multi-Hunters](https://github.com/fbef0102/L4D2-Multi-Hunters)</b>: Experience multi Hunters hell...

@@ -28,6 +28,7 @@ enum WeaponID
 	ID_SCOUT,
 	ID_SPASSHOTGUN
 }
+#define PISTOL_RELOAD_INCAP_MULTIPLY 1.25
 char Weapon_Name[WeaponID][32];
 int WeaponAmmoOffest[WeaponID];
 int WeaponMaxClip[WeaponID];
@@ -80,7 +81,7 @@ public Plugin:myinfo =
 	name = "L4D2 weapon csgo reload",
 	author = "Harry Potter",
 	description = "reload like csgo weapon",
-	version = "1.4",
+	version = "1.5",
 	url = "Harry Potter myself,you bitch shit"
 };
 
@@ -348,8 +349,20 @@ public Action OnWeaponReload_Event(Handle event, const char[] name, bool dontBro
 		case (WeaponID:ID_SMG): CreateDataTimer(g_SmgTimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
 		case (WeaponID:ID_RIFLE): CreateDataTimer(g_RifleTimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
 		case (WeaponID:ID_HUNTING_RIFLE): CreateDataTimer(g_HuntingRifleTimeCvar, WeaponReloadClip, pack,TIMER_FLAG_NO_MAPCHANGE);
-		case (WeaponID:ID_PISTOL): CreateDataTimer(g_PistolTimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
-		case (WeaponID:ID_DUAL_PISTOL): CreateDataTimer(g_DualPistolTimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
+		case (WeaponID:ID_PISTOL): 
+		{
+			if(IsIncapacitated(client))
+				CreateDataTimer(g_PistolTimeCvar * PISTOL_RELOAD_INCAP_MULTIPLY, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
+			else
+				CreateDataTimer(g_PistolTimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
+		}
+		case (WeaponID:ID_DUAL_PISTOL):
+		{
+			if(IsIncapacitated(client))
+				CreateDataTimer(g_DualPistolTimeCvar * PISTOL_RELOAD_INCAP_MULTIPLY, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
+			else
+				CreateDataTimer(g_DualPistolTimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
+		}
 		case (WeaponID:ID_SMG_SILENCED): CreateDataTimer(g_SmgSilencedTimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
 		case (WeaponID:ID_SMG_MP5): CreateDataTimer(g_SmgMP5TimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
 		case (WeaponID:ID_AK47): CreateDataTimer(g_AK47TimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
@@ -359,7 +372,13 @@ public Action OnWeaponReload_Event(Handle event, const char[] name, bool dontBro
 		case (WeaponID:ID_GRENADE): CreateDataTimer(g_GrenadeTimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
 		case (WeaponID:ID_SG552): CreateDataTimer(g_SG552TimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
 		case (WeaponID:ID_SNIPER_MILITARY): CreateDataTimer(g_SniperMilitaryTimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
-		case (WeaponID:ID_MAGNUM): CreateDataTimer(g_MangumTimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
+		case (WeaponID:ID_MAGNUM):
+		{
+			if(IsIncapacitated(client))
+				CreateDataTimer(g_MangumTimeCvar * PISTOL_RELOAD_INCAP_MULTIPLY, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
+			else
+				CreateDataTimer(g_MangumTimeCvar, WeaponReloadClip, pack, TIMER_FLAG_NO_MAPCHANGE);
+		}
 		default: return Plugin_Continue;
 	}
 	WritePackCell(pack, client);
@@ -453,6 +472,12 @@ stock void SetWeaponClip(int weapon, int clip)
 {
 	SetEntProp(weapon, Prop_Send, "m_iClip1", clip);
 } 
+
+stock IsIncapacitated(client)
+{
+	return GetEntProp(client, Prop_Send, "m_isIncapacitated");
+}
+
 stock WeaponID GetWeaponID(int weapon,const char[] weapon_name)
 {
 	if(StrEqual(weapon_name,Weapon_Name[ID_DUAL_PISTOL],false) && GetEntProp(weapon, Prop_Send, "m_hasDualWeapons"))

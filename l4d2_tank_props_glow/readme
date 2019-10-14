@@ -1,30 +1,30 @@
 When a Tank punches a Hittable it adds a Glow to the hittable which all infected players can see.
 this video shows how it works: https://www.youtube.com/watch?v=UZDF6dbagxU&feature=youtu.be
 
--command-
+-convars-
 (l4d2_tank_props_glow.cfg in \cfg\sourcemod\ folder.)
-// Three values between 0-255 separated by spaces. RGB Color255 - Red Green Blue.
-// 發光顏色 紅 綠 藍 
+// Prop Glow Color, three values between 0-255 separated by spaces. RGB Color255 - Red Green Blue.
+// -
 // Default: "255 255 255"
 l4d2_tank_prop_glow_color "255 255 255"
 
 // Only Tank can see the glow
-// 只讓坦克看到發光輪廓?
+// -
 // Default: "0"
 l4d2_tank_prop_glow_only "0"
 
 // How near to props do players need to be to enable their glow.
-// 距離多近才發光
-// Default: "5000"
-l4d2_tank_prop_glow_range "5000"
+// -
+// Default: "4500"
+l4d2_tank_prop_glow_range "4500"
 
 // Spectators can see the glow too
-// 旁觀者是否也能看到發光輪廓?
+// -
 // Default: "1"
 l4d2_tank_prop_glow_spectators "1"
 
-// Show Hittable Glow for inf team whilst the tank is alive
-// 開啟此插件
+// Show Hittable Glow for infected team while the tank is alive
+// -
 // Default: "1"
 l4d_tank_props_glow "1"
 

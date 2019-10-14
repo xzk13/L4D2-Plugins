@@ -14,7 +14,7 @@ int i_Ent[5000] = -1;
 int iTankClient = -1;
 bool tankSpawned;
 
-public Plugin:myinfo = {
+public Plugin myinfo = {
     name        = "L4D2 Tank Hittable Glow",
     author      = "Harry Potter",
     version     = "1.7",

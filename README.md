@@ -3,7 +3,7 @@ L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun p
 >All plugins in here only apply to L4D2 (last edited:2019/10/15)
 # Require
 * Clean Servers:
-  * [Sourcemod 1.8](https://www.sourcemod.net/downloads.php?branch=1.8-dev) (or newer), [Metamod](https://www.metamodsource.net/downloads.php?branch=stable)
+  * [Sourcemod 1.9](https://www.sourcemod.net/downloads.php?branch=1.9-dev) (or newer), [Metamod](https://www.metamodsource.net/downloads.php?branch=stable)
 * <b>[GameRules Prop Hax](https://forums.alliedmods.net/showthread.php?t=154217)</b>
 # Plugins
 * <b>sm_l4d_mapchanger</b>: Force change to next mission when current mission end.

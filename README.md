@@ -15,8 +15,8 @@ L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun p
 * <b>l4d_pig_infected_notify</b>: show who is pig teammate in infected team
 * <b>l4d2_votes4</b>: L4D2 Vote Menu
 # Scripting Compiler
-most of source codes using [sourcemod 1.63](http://sourcemod.otstrel.ru) Compiler, some source codes need [sourcemod 1.9](https://www.sourcemod.net/downloads.php?branch=1.9-dev) if you want to edit code and recomplie
-* <b>[colors.inc](https://forums.alliedmods.net/showthread.php?t=96831)</b>
+* [sourcemod 1.63](https://github.com/fbef0102/L4D1-Competitive-Plugins/releases/download/v1.0/sourcemod_1.63.zip): most of source codes
+* [sourcemod 1.9](https://github.com/fbef0102/L4D1-Competitive-Plugins/releases/download/v1.0/sourcemod_1.9.zip): few source codes need new compiler
 # Others
 * <b>[L4D1-Competitive-Plugins](https://github.com/fbef0102/L4D1-Competitive-Plugins)</b>: L4D1 Competitive enhancement
 * <b>[L4D1_2-Plugins](https://github.com/fbef0102/L4D1_2-Plugins)</b>: L4D1/2 general purpose and freaky-fun plugins.

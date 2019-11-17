@@ -1,9 +1,9 @@
 # L4D2-Plugins by Harry Potter
 L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun plugins.
->All plugins in here only apply to L4D2 (last edited:2019/10/15)
+>All plugins in here only apply to L4D2 (last edited:2019/11/17)
 # Require
 * Clean Servers:
-  * [Sourcemod 1.9](https://www.sourcemod.net/downloads.php?branch=1.9-dev) (or newer), [Metamod](https://www.metamodsource.net/downloads.php?branch=stable)
+  * [Sourcemod 1.8](https://www.sourcemod.net/downloads.php?branch=1.8-dev) (or newer), [Metamod](https://www.metamodsource.net/downloads.php?branch=stable)
 * <b>[GameRules Prop Hax](https://forums.alliedmods.net/showthread.php?t=154217)</b>
 # Plugins
 * <b>sm_l4d_mapchanger</b>: Force change to next mission when current mission end.
@@ -15,8 +15,7 @@ L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun p
 * <b>l4d_pig_infected_notify</b>: show who is pig teammate in infected team
 * <b>l4d2_votes4</b>: L4D2 Vote Menu
 # Scripting Compiler
-* [sourcemod 1.63](https://github.com/fbef0102/L4D1-Competitive-Plugins/releases/download/v1.0/sourcemod_1.63.zip): most of source codes
-* [sourcemod 1.9](https://github.com/fbef0102/L4D1-Competitive-Plugins/releases/download/v1.0/sourcemod_1.9.zip): few source codes need new compiler
+* [sourcemod 1.8](https://github.com/fbef0102/L4D2-Plugins/releases/download/v1.0/sourcemod_1.8_Compiler.zip): few source codes need new compiler
 # Others
 * <b>[L4D1-Competitive-Plugins](https://github.com/fbef0102/L4D1-Competitive-Plugins)</b>: L4D1 Competitive enhancement
 * <b>[L4D1_2-Plugins](https://github.com/fbef0102/L4D1_2-Plugins)</b>: L4D1/2 general purpose and freaky-fun plugins.

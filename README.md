@@ -15,7 +15,7 @@ L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun p
 * <b>l4d_pig_infected_notify</b>: show who is pig teammate in infected team
 * <b>l4d2_votes4</b>: L4D2 Vote Menu
 # Scripting Compiler
-* [sourcemod 1.8](https://github.com/fbef0102/L4D2-Plugins/releases/download/v1.0/sourcemod_1.8_Compiler.zip): few source codes need new compiler
+* [sourcemod 1.8](https://github.com/fbef0102/L4D2-Plugins/releases/download/v1.0/sourcemod_1.8_Compiler.zip) compiler: sourcemod v1.8.0.5977 scripting
 # Others
 * <b>[L4D1-Competitive-Plugins](https://github.com/fbef0102/L4D1-Competitive-Plugins)</b>: L4D1 Competitive enhancement
 * <b>[L4D1_2-Plugins](https://github.com/fbef0102/L4D1_2-Plugins)</b>: L4D1/2 general purpose and freaky-fun plugins.

@@ -26,12 +26,13 @@ enum WeaponID
 	ID_M60,
 	ID_AWP,
 	ID_SCOUT,
-	ID_SPASSHOTGUN
+	ID_SPASSHOTGUN,
+	ID_WEAPON_MAX
 }
 #define PISTOL_RELOAD_INCAP_MULTIPLY 1.25
-char Weapon_Name[WeaponID][32];
-int WeaponAmmoOffest[WeaponID];
-int WeaponMaxClip[WeaponID];
+char Weapon_Name[ID_WEAPON_MAX][32];
+int WeaponAmmoOffest[ID_WEAPON_MAX];
+int WeaponMaxClip[ID_WEAPON_MAX];
 
 //cvars
 Handle hEnableReloadClipCvar;
@@ -81,8 +82,8 @@ public Plugin:myinfo =
 	name = "L4D2 weapon csgo reload",
 	author = "Harry Potter",
 	description = "reload like csgo weapon",
-	version = "1.5",
-	url = "Harry Potter myself,you bitch shit"
+	version = "1.6",
+	url = "https://forums.alliedmods.net/showthread.php?t=318820"
 };
 
 public void OnPluginStart()

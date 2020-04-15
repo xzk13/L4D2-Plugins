@@ -1,6 +1,6 @@
 # L4D2-Plugins by Harry Potter
 L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun plugins.
->All plugins in here only apply to L4D2 (last edited:2020/4/15)
+>All plugins in here only apply to L4D2 (last edited:2020/4/16)
 # Require
 * Clean Servers:
   * [Sourcemod 1.8](https://www.sourcemod.net/downloads.php?branch=1.8-dev) (or newer), [Metamod](https://www.metamodsource.net/downloads.php?branch=stable)
@@ -15,6 +15,7 @@ L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun p
 * <b>l4d_pig_infected_notify</b>: show who is pig teammate in infected team
 * <b>l4d2_votes4</b>: L4D2 Vote Menu
 * <b>l4dinfectedbots</b>: Spawns infected bots in versus, allows playable special infected in coop/survival, and changable z_max_player_zombies limit
+* <b>l4d2_mix</b>: L4D2 Mix/Pick up
 # Scripting Compiler
 * [sourcemod 1.8](https://github.com/fbef0102/L4D2-Plugins/releases/download/v1.0/sourcemod_1.8_Compiler.zip) compiler: sourcemod v1.8.0.5977 scripting
 # Others

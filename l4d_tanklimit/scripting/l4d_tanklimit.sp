@@ -15,7 +15,7 @@ public Plugin:myinfo =
 
 public OnPluginStart()
 {
-	g_hLimitTank	= CreateConVar("z_limit_tank", "3", "Maximum of tanks in server.", _, true, 0.0, true, 1.0);
+	g_hLimitTank	= CreateConVar("z_tank_limit", "3", "Maximum of tanks in server.",FCVAR_NOTIFY);
 	HookEvent("tank_spawn", PD_ev_TankSpawn);
 	
 	g_LimitTank = GetConVarInt(g_hLimitTank);
@@ -38,11 +38,11 @@ public Action:PD_ev_TankSpawn(Handle:event, const String:name[], bool:dontBroadc
 }
 public Action:CheckAndKickTank(Handle:timer,any:client)
 {
-	if(IsClientConnected(client) && IsClientInGame(client)&&IsPlayerTank(client))
+	if(IsClientConnected(client) && IsClientInGame(client)&&IsPlayerTank(client)&&IsFakeClient(client))
 	{
 		new tank_count = 0;
 		for (new i=1;i<=MaxClients;i++)
-			if(IsClientConnected(i) && IsClientInGame(i) && IsPlayerTank(i) && IsPlayerAlive(i))
+			if(IsClientConnected(i) && IsClientInGame(i) && GetClientTeam(i)==3 && IsPlayerTank(i) && IsPlayerAlive(i))
 				tank_count++;
 		
 		//PrintToChatAll("tank_count: %d, g_LimitTank: %d", tank_count,g_LimitTank);		

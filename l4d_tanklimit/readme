@@ -1,4 +1,4 @@
 limit tank in server
 
 -command-
-"z_limit_tank", "10", "maximum of tanks in server"
+"z_tank_limit", "3", "maximum of tanks in server"

@@ -3800,19 +3800,21 @@ BotTypeNeeded()
 					#endif
 					return 6;
 				}
-				random++;
+				random = 1;
 			}
 			
 			if (random == 7)
 			{
-				if (tanks < GetConVarInt(h_TankLimit))
+				new random2 = GetURandomIntRange(1, 3);
+				
+				if (tanks < GetConVarInt(h_TankLimit) && random2 == 3)
 				{
 					#if DEBUGSERVER
 					LogMessage("Bot type returned Tank");
 					#endif
 					return 7;
 				}
-				random=1;
+				random = GetURandomIntRange(1, 6);
 			}
 		}
 	}
@@ -3854,18 +3856,20 @@ BotTypeNeeded()
 					#endif
 					return 3;
 				}
-				random++;
+				random=1;
 			}
 			if (random == 4)
 			{
-				if (tanks < GetConVarInt(h_TankLimit))
+				new random2 = GetURandomIntRange(1, 3);
+				
+				if (tanks < GetConVarInt(h_TankLimit) && random2 == 3)
 				{
 					#if DEBUGSERVER
 					LogMessage("Bot type returned Tank");
 					#endif
 					return 7;
 				}
-				random=1;
+				random = GetURandomIntRange(1, 3);
 			}
 		}
 	}

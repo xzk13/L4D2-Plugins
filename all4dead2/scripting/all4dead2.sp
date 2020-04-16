@@ -24,7 +24,7 @@ Copyright 2009 James Richardson
 // Define constants
 #define PLUGIN_NAME					"All4Dead"
 #define PLUGIN_TAG					"[A4D] "
-#define PLUGIN_VERSION			"2.0.1"
+#define PLUGIN_VERSION			"2.0.2"
 #define MENU_DISPLAY_TIME		15
 
 // Include necessary files
@@ -751,6 +751,7 @@ public Action:Menu_CreateMeleeWeaponMenu(client, args) {
 	SetMenuTitle(menu, "Spawn Melee Weapons");
 	SetMenuExitBackButton(menu, true);
 	SetMenuExitButton(menu, true);
+	
 	AddMenuItem(menu, "ma", "Spawn a baseball bat");
 	AddMenuItem(menu, "mb", "Spawn a chainsaw");
 	AddMenuItem(menu, "mc", "Spawn a cricket bat");
@@ -761,6 +762,9 @@ public Action:Menu_CreateMeleeWeaponMenu(client, args) {
 	AddMenuItem(menu, "mh", "Spawn a katana");
 	AddMenuItem(menu, "mi", "Spawn a machete");
 	AddMenuItem(menu, "mj", "Spawn a police baton");
+	AddMenuItem(menu, "mk", "Spawn a knife");
+	AddMenuItem(menu, "ml", "Spawn a golf club");
+	
 	DisplayMenu(menu, client, MENU_DISPLAY_TIME);
 	return Plugin_Handled;
 }
@@ -788,7 +792,12 @@ public Menu_SpawnMeleeWeaponHandler(Handle:menu, MenuAction:action, cindex, item
 				Do_SpawnItem(cindex, "machete");
 			} case 9: {
 				Do_SpawnItem(cindex, "tonfa");
+			} case 10: {
+				Do_SpawnItem(cindex, "knife");
+			} case 11: {
+				Do_SpawnItem(cindex, "golfclub");
 			} 
+			
 		}
 		Menu_CreateMeleeWeaponMenu(cindex, false);
 	} else if (action == MenuAction_End)

@@ -18,6 +18,7 @@ L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun p
 * <b>l4d2_mix</b>: L4D2 Mix/Pick up
 * <b>all4dead2</b>: Enables admins to have control over the AI Director without using sv_cheats 1
 * <b>l4d2_assist_NoModels</b>: Show damage done to S.I. by survivors
+* <b>l4d2_gifts</b>: Drop gifts (press E to earn reward) when a special infected died
 # Scripting Compiler
 * [sourcemod 1.8](https://github.com/fbef0102/L4D2-Plugins/releases/download/v1.0/sourcemod_1.8_Compiler.zip) compiler: sourcemod v1.8.0.5977 scripting
 # Others

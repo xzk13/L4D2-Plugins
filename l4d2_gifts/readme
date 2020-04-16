@@ -1,0 +1,13 @@
+Drop gifts (press E to earn reward) when a special infected died
+
+-command-
+"l4d2_gifts_enabled",	"1", "Enable gifts 0: Disable, 1: Enable"
+"l4d2_gifts_giflife",	"30",	"How long the gift stay on ground (seconds)"
+"l4d2_gifts_chance", "40",	"Chance (%) of infected drop gift."
+"l4d2_gifts_pointsE", "10", "Points for take a gift standard (animals and other objects). Disabled if there is not database"
+"l4d2_gifts_pointsS", "20", "Points for take a gift special. Disabled if there is not database"
+"l4d2_gifts_probabilityE", "0", "Probability for gifts standard (animals and other objects) with respect to chance of infected drop gift."
+"l4d2_gifts_probabilityS", "100", "Probability for gift special with respect to chance of infected drop gift."
+"l4d2_gifts_maxcollectMap", "0", "Maximum of gifts that all survivors can pick up per map [0 = Disabled]"
+"l4d2_gifts_maxcollectRound", "0", "Maximum of gifts that all survivors can pick up per round [0 = Disabled]"
+	

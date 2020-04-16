@@ -16,6 +16,8 @@ L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun p
 * <b>l4d2_votes4</b>: L4D2 Vote Menu
 * <b>l4dinfectedbots</b>: Spawns infected bots in versus, allows playable special infected in coop/survival, and changable z_max_player_zombies limit
 * <b>l4d2_mix</b>: L4D2 Mix/Pick up
+* <b>all4dead2</b>: Enables admins to have control over the AI Director without using sv_cheats 1
+* <b>l4d2_assist_NoModels</b>: Show damage done to S.I. by survivors
 # Scripting Compiler
 * [sourcemod 1.8](https://github.com/fbef0102/L4D2-Plugins/releases/download/v1.0/sourcemod_1.8_Compiler.zip) compiler: sourcemod v1.8.0.5977 scripting
 # Others

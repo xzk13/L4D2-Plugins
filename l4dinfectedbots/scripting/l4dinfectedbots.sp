@@ -1,6 +1,6 @@
 /********************************************************************************************
 * Plugin	: L4D/L4D2 InfectedBots (Versus Coop/Coop Versus)
-* Version	: 2.1.1
+* Version	: 2.1.2
 * Game		: Left 4 Dead 1 & 2
 * Author	: djromero (SkyDavid, David) and MI 5 and Harry Potter
 * Testers	: Myself, MI 5
@@ -9,7 +9,11 @@
 * Purpose	: This plugin spawns infected bots in L4D1, and gives greater control of the infected bots in L4D1/L4D2.
 * 
 * WARNING	: Please use sourcemod's latest 1.3 branch snapshot.
-*  
+*
+* Version 2.1.2
+	   - Remove tank spawn bug
+	   - Fixed Not enough space on the stack "BotTypeNeeded"
+
 * Version 2.1.1
 	   - Defines how many special infected according to current player numbers
 	   - Defines Tank Health according to current player numbers
@@ -1883,6 +1887,9 @@ public Action:CheckQueue(client, args)
 
 public Action:JoinInfected(client, args)
 {
+	//SetEntProp(client,Prop_Send,"m_isCulling",1);
+	//ClientCommand(client, "+use");
+		
 	if (client && (GameMode == 1 || GameMode == 3) && GetConVarBool(h_JoinableTeams))
 	{
 		if (GetConVarBool(h_AdminJoinInfected))
@@ -2086,11 +2093,11 @@ public Action:evtPlayerSpawn(Handle:event, const String:name[], bool:dontBroadca
 	
 	if (IsPlayerTank(client))
 	{
-		if (L4D2Version && GameMode == 1 && IsFakeClient(client) && RealPlayersOnInfected() && !DisallowTankFunction)
+		/*if (L4D2Version && GameMode == 1 && IsFakeClient(client) && RealPlayersOnInfected() && !DisallowTankFunction)
 		{
 			CreateTimer(0.1, TankBugFix, client);
 			CreateTimer(0.2, kickbot, client);
-		}
+		}*/
 		if (b_LeftSaveRoom)
 		{	
 			#if DEBUGSERVER
@@ -3596,7 +3603,7 @@ BotTypeNeeded()
 			}
 		}
 	}
-	
+	/*
 	if  (L4D2Version)
 	{
 		new random = GetURandomIntRange(1, 7);
@@ -3723,6 +3730,148 @@ BotTypeNeeded()
 		
 		return BotTypeNeeded();
 	}
+	*/
+	if  (L4D2Version)
+	{
+		new random = GetURandomIntRange(1, 7);
+		
+		new i=0;
+		while(i++<10)
+		{
+			if (random == 1)
+			{
+				if ((hunters < HunterLimit) && (canSpawnHunter))
+				{
+					#if DEBUGSERVER
+					LogMessage("Bot type returned Hunter");
+					#endif
+					return 1;
+				}
+			}
+			if (random == 2)
+			{
+				if ((smokers < SmokerLimit) && (canSpawnSmoker))
+				{
+					#if DEBUGSERVER
+					LogMessage("Bot type returned Smoker");
+					#endif
+					return 2;
+				}
+				random++;
+			}
+			if (random == 3)
+			{
+				if ((boomers < BoomerLimit) && (canSpawnBoomer))
+				{
+					#if DEBUGSERVER
+					LogMessage("Bot type returned Boomer");
+					#endif
+					return 3;
+				}
+				random++;
+			}
+			if (random == 4)
+			{
+				if ((spitters < SpitterLimit) && (canSpawnSpitter))
+				{
+					#if DEBUGSERVER
+					LogMessage("Bot type returned Spitter");
+					#endif
+					return 4;
+				}
+				random++;
+			}
+			if (random == 5)
+			{
+				if ((jockeys < JockeyLimit) && (canSpawnJockey))
+				{
+					#if DEBUGSERVER
+					LogMessage("Bot type returned Jockey");
+					#endif
+					return 5;
+				}
+			}
+			if (random == 6)
+			{
+				if ((chargers < ChargerLimit) && (canSpawnCharger))
+				{
+					#if DEBUGSERVER
+					LogMessage("Bot type returned Charger");
+					#endif
+					return 6;
+				}
+				random++;
+			}
+			
+			if (random == 7)
+			{
+				if (tanks < GetConVarInt(h_TankLimit))
+				{
+					#if DEBUGSERVER
+					LogMessage("Bot type returned Tank");
+					#endif
+					return 7;
+				}
+				random=1;
+			}
+		}
+	}
+	else
+	{
+		new random = GetURandomIntRange(1, 4);
+		
+		new i=0;
+		while(i++<10)
+		{
+			if (random == 1)
+			{
+				if (hunters < HunterLimit && canSpawnHunter)
+				{
+					#if DEBUGSERVER
+					LogMessage("Returning Hunter");
+					#endif
+					return 1;
+				}
+				random++;
+			}
+			if (random == 2)
+			{
+				if ((smokers < SmokerLimit) && (canSpawnSmoker)) // we need a smoker ???? can we spawn a smoker ??? is smoker bot allowed ??
+				{
+					#if DEBUGSERVER
+					LogMessage("Returning Smoker");
+					#endif
+					return 2;
+				}
+				random++;
+			}
+			if (random == 3)
+			{
+				if ((boomers < BoomerLimit) && (canSpawnBoomer))
+				{
+					#if DEBUGSERVER
+					LogMessage("Returning Boomer");
+					#endif
+					return 3;
+				}
+				random++;
+			}
+			if (random == 4)
+			{
+				if (tanks < GetConVarInt(h_TankLimit))
+				{
+					#if DEBUGSERVER
+					LogMessage("Bot type returned Tank");
+					#endif
+					return 7;
+				}
+				random=1;
+			}
+		}
+	}
+	
+	return 0;
+	
 }
 
 

@@ -9,28 +9,40 @@ public Plugin:myinfo =
 	name = "L4D2 Limit Tank",
 	author = "Harry Potter",
 	description = "limit tank in server",
-	version = "1.0",
+	version = "1.1",
 	url = "https://steamcommunity.com/id/fbef0102/"
 }
 
 public OnPluginStart()
 {
-	g_hLimitTank	= CreateConVar("z_limit_tank", "10", "maximum of tanks in server", _, true, 0.0, true, 1.0);
+	g_hLimitTank	= CreateConVar("z_limit_tank", "3", "Maximum of tanks in server.", _, true, 0.0, true, 1.0);
 	HookEvent("tank_spawn", PD_ev_TankSpawn);
 	
 	g_LimitTank = GetConVarInt(g_hLimitTank);
 	HookConVarChange(g_hLimitTank, Limit_CvarChange);
 	
+	AutoExecConfig(true, "l4d_tanklimit");
 }
 
 public Action:PD_ev_TankSpawn(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
+	if(!IsClientInGame(client) || !IsFakeClient(client)) return;
+	
+	
 	if(g_LimitTank >= 0)
+	{
+		CreateTimer(1.5, CheckAndKickTank,client);
+	}
+	
+}
+public Action:CheckAndKickTank(Handle:timer,any:client)
+{
+	if(IsClientConnected(client) && IsClientInGame(client)&&IsPlayerTank(client))
 	{
 		new tank_count = 0;
 		for (new i=1;i<=MaxClients;i++)
-			if(IsClientConnected(i) && IsClientInGame(i)&&IsPlayerTank(i))
+			if(IsClientConnected(i) && IsClientInGame(i) && IsPlayerTank(i) && IsPlayerAlive(i))
 				tank_count++;
 		
 		//PrintToChatAll("tank_count: %d, g_LimitTank: %d", tank_count,g_LimitTank);		
@@ -40,17 +52,8 @@ public Action:PD_ev_TankSpawn(Handle:event, const String:name[], bool:dontBroadc
 			Float:{0.0, 0.0, 0.0}, // Teleport to map center
 			NULL_VECTOR, 
 			NULL_VECTOR);
-			CreateTimer(1.5, KickTank,client);
+			KickClient(client);
 		}
-	}
-	
-}
-public Action:KickTank(Handle:timer,any:client)
-{
-	if(IsClientConnected(client) && IsClientInGame(client)&&IsPlayerTank(client))
-	{
-		KickClient(client);
-		//PrintToChatAll("server auto kicks a tank");
 	}
 }
 public Limit_CvarChange(Handle:convar, const String:oldValue[], const String:newValue[])

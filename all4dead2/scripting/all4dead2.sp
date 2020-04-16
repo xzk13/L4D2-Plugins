@@ -24,7 +24,7 @@ Copyright 2009 James Richardson
 // Define constants
 #define PLUGIN_NAME					"All4Dead"
 #define PLUGIN_TAG					"[A4D] "
-#define PLUGIN_VERSION			"2.0.2"
+#define PLUGIN_VERSION			"2.0.3"
 #define MENU_DISPLAY_TIME		15
 
 // Include necessary files
@@ -60,6 +60,7 @@ new Float:last_zombie_spawn_location[3];
 new Handle:refresh_timer = INVALID_HANDLE;
 new last_zombie_spawned = 0;
 new bool:automatic_placement;
+new bool:bSpawnWitch_NotAllowd;
 
 /// Metadata for the mod - used by SourceMod
 public Plugin:myinfo = {
@@ -115,6 +116,17 @@ public OnMapStart() {
 	PrecacheModel("models/infected/common_male_roadcrew.mdl", true);
 	PrecacheModel("models/infected/common_male_jimmy.mdl", true);
 	PrecacheModel("models/infected/common_male_fallen_survivor.mdl", true);
+	
+	decl String:mapbuf[32];
+	GetCurrentMap(mapbuf, sizeof(mapbuf));	
+	if(StrEqual(mapbuf, "c6m1_riverbank"))
+	{
+		bSpawnWitch_NotAllowd = true;
+	}
+	else
+		bSpawnWitch_NotAllowd = false;
+	
+	
 }
 
 public OnPluginEnd() {
@@ -271,7 +283,10 @@ public Menu_TopItemHandler(Handle:topmenu, TopMenuAction:action, TopMenuObject:o
 
 /// Creates the infected spawning menu when it is selected from the top menu and displays it to the client.
 public Action:Menu_CreateSpecialInfectedMenu(client, args) {
-	new Handle:menu = CreateMenu(Menu_SpawnSInfectedHandler);
+	new Handle:menu;
+	if(bSpawnWitch_NotAllowd) menu = CreateMenu(Menu_SpawnSInfectedHandler2);
+	else menu = CreateMenu(Menu_SpawnSInfectedHandler);
+	 
 	SetMenuTitle(menu, "Spawn Special Infected");
 	SetMenuExitBackButton(menu, true);
 	SetMenuExitButton(menu, true);
@@ -280,7 +295,7 @@ public Action:Menu_CreateSpecialInfectedMenu(client, args) {
 	else 
 		AddMenuItem(menu, "ap", "Enable automatic placement");
 	AddMenuItem(menu, "st", "Spawn a tank");
-	AddMenuItem(menu, "sw", "Spawn a witch");
+	if(!bSpawnWitch_NotAllowd) AddMenuItem(menu, "sw", "Spawn a witch");
 	AddMenuItem(menu, "sb", "Spawn a boomer");
 	AddMenuItem(menu, "sh", "Spawn a hunter");
 	AddMenuItem(menu, "ss", "Spawn a smoker");
@@ -318,6 +333,43 @@ public Menu_SpawnSInfectedHandler(Handle:menu, MenuAction:action, cindex, itempo
 			case 8:
 				Do_SpawnInfected(cindex, "charger", false);
 			case 9:
+				Do_SpawnInfected(cindex, "mob", false);
+		}
+		// If none of the above matches show the menu again
+		Menu_CreateSpecialInfectedMenu(cindex, false);
+	// If someone closes the menu - close the menu
+	} else if (action == MenuAction_End)
+		CloseHandle(menu);
+	// If someone presses 'back' (8), return to main All4Dead menu */
+	else if (action == MenuAction_Cancel)
+		if (itempos == MenuCancel_ExitBack && admin_menu != INVALID_HANDLE)
+			DisplayTopMenu(admin_menu, cindex, TopMenuPosition_LastCategory);
+}
+
+public Menu_SpawnSInfectedHandler2(Handle:menu, MenuAction:action, cindex, itempos) {
+	// When a player selects an item do this.		
+	if (action == MenuAction_Select) {
+		switch (itempos) {
+			case 0:
+				if (automatic_placement) 
+					Do_EnableAutoPlacement(cindex, false); 
+				else
+					Do_EnableAutoPlacement(cindex, true);
+			case 1:
+				Do_SpawnInfected(cindex, "tank", false);
+			case 2:
+				Do_SpawnInfected(cindex, "boomer", false);
+			case 3:
+				Do_SpawnInfected(cindex, "hunter", false);
+			case 4:
+				Do_SpawnInfected(cindex, "smoker", false);
+			case 5:
+				Do_SpawnInfected(cindex, "spitter", false);
+			case 6:
+				Do_SpawnInfected(cindex, "jockey", false);
+			case 7:
+				Do_SpawnInfected(cindex, "charger", false);
+			case 8:
 				Do_SpawnInfected(cindex, "mob", false);
 		}
 		// If none of the above matches show the menu again
@@ -434,6 +486,7 @@ public Action:Command_SpawnUInfected(client, args) {
  * </remarks>
 */
 Do_SpawnInfected(client, const String:type[], bool:spawning_uncommon) {
+  
   if(StrEqual(type, "tank") && RealPlayersOnInfected())
   {
 	new bot = CreateFakeClient("Infected Bot");

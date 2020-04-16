@@ -421,7 +421,7 @@
 
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "2.0.0"
+#define PLUGIN_VERSION "2.1.2"
 
 #define DEBUGSERVER 0
 #define DEBUGCLIENTS 0
@@ -2093,11 +2093,13 @@ public Action:evtPlayerSpawn(Handle:event, const String:name[], bool:dontBroadca
 	
 	if (IsPlayerTank(client))
 	{
-		/*if (L4D2Version && GameMode == 1 && IsFakeClient(client) && RealPlayersOnInfected() && !DisallowTankFunction)
+		new String:clientname[256];
+		GetClientName(client, clientname, sizeof(clientname));
+		if (L4D2Version && GameMode == 1 && IsFakeClient(client) && RealPlayersOnInfected() && !DisallowTankFunction /*&& !HasOtherFakeTank(client)*/ && StrContains(clientname, "Bot", false) == -1)
 		{
 			CreateTimer(0.1, TankBugFix, client);
 			CreateTimer(0.2, kickbot, client);
-		}*/
+		}
 		if (b_LeftSaveRoom)
 		{	
 			#if DEBUGSERVER
@@ -2134,7 +2136,7 @@ public Action:evtPlayerSpawn(Handle:event, const String:name[], bool:dontBroadca
 				{
 					if (IsFakeClient(client) && RealPlayersOnInfected())
 					{
-						if (L4D2Version && !AreTherePlayersWhoAreNotTanks() && GetConVarBool(h_CoopPlayableTank) && !DisallowTankFunction || L4D2Version && !GetConVarBool(h_CoopPlayableTank) && !DisallowTankFunction)
+						if (L4D2Version && !AreTherePlayersWhoAreNotTanks() && GetConVarBool(h_CoopPlayableTank) /*&& !HasOtherFakeTank(client)*/ && !DisallowTankFunction || L4D2Version && !GetConVarBool(h_CoopPlayableTank) && !DisallowTankFunction /*&& !HasOtherFakeTank(client)*/ )
 						{
 							CreateTimer(0.1, TankBugFix, client);
 							CreateTimer(0.2, kickbot, client);
@@ -3315,15 +3317,7 @@ public Action:TankRespawner(Handle:timer, any:datapack)
 	}
 	
 	CheatCommand(anyclient, "z_spawn_old", "tank auto");
-	
-	
-	/*if (GetConVarBool(h_CoopPlayableTank))
-	{
-	TankHalt = true;
-	}
-	
-	// Start the Tank Halt Timer
-	CreateTimer(2.0, TankHaltTimer, _, TIMER_FLAG_NO_MAPCHANGE);*/
+
 	
 	// We restore the player's status
 	for (new i=1;i<=MaxClients;i++)
@@ -3430,14 +3424,6 @@ public Action:TankBugFix(Handle:timer, any:client)
 	
 	CheatCommand(anyclient, "z_spawn_old", "tank auto");
 	
-	
-	/*if (GetConVarBool(h_CoopPlayableTank))
-	{
-	TankHalt = true;
-	}
-	
-	// Start the Tank Halt Timer
-	CreateTimer(2.0, TankHaltTimer, _, TIMER_FLAG_NO_MAPCHANGE);*/
 	
 	// We restore the player's status
 	for (new i=1;i<=MaxClients;i++)
@@ -5249,4 +5235,16 @@ stock SwitchToSurvivors(client)
 	SDKCall(hSwitch, client, true);
 	return;
 }
+/*
+bool:HasOtherFakeTank(client)
+{
+	for (new i=1;i<=MaxClients;i++)
+	{
+		if ( i != client && IsClientInGame(i) && IsFakeClient(i) && GetClientTeam(i) == 3 && IsPlayerTank(i) && IsPlayerAlive(i)) // player is connected and is not fake and it's in game ...
+		{
+			return true;
+		}
+	}
+	return false;
+}*/
 ///////////////////////////////////////////////////////////////////////////

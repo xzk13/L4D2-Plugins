@@ -1,6 +1,41 @@
 Drop gifts (press E to earn reward) when a special infected died
+-Items that could drop-
+{"defibrillator","電擊器"}
+{"first_aid_kit","治療包"}
+{"pain_pills", "止痛藥丸"}
+{"adrenaline", "腎上腺素"}
+{"molotov", "火瓶"}
+{"pipe_bomb", "土製炸彈"}
+{"vomitjar", "膽汁"}
+{"gascan","汽油"}
+{"propanetank", "瓦斯桶"}
+{"oxygentank", "氧氣罐"}
+{"weapon_upgradepack_incendiary", "火焰包"}
+{"weapon_upgradepack_explosive","高爆彈"}
+{"pistol","手槍"}
+{"pistol_magnum", "沙漠之鷹"}
+{"pumpshotgun", "木製霰彈槍"}
+{"shotgun_chrome", "鐵製霰彈槍"}
+{"smg", "機槍"}
+{"smg_silenced", "消音機槍"}
+{"smg_mp5","MP5衝鋒槍"}
+{"rifle", "步槍"}
+{"rifle_sg552", "SG552步槍"}
+{"rifle_ak47", "AK47"}
+{"rifle_desert","三連發步槍"}
+{"shotgun_spas","戰鬥霰彈槍"}
+{"autoshotgun", "連發霰彈槍"}
+{"hunting_rifle", "狙擊槍"}
+{"sniper_military", "軍用狙擊槍"}
+{"sniper_scout", "SCOUT狙擊槍"}
+{"sniper_awp", "AWP"}
+{"grenade_launcher","榴彈發射器"}
+{"rifle_m60", "M60機關槍"}
+{"knife", "小刀"}
+{"chainsaw", "奪魂鋸"}
+{"baseball_bat", "球棒"}
 
--command-
+-Convars-
 "l4d2_gifts_enabled",	"1", "Enable gifts 0: Disable, 1: Enable"
 "l4d2_gifts_giflife",	"30",	"How long the gift stay on ground (seconds)"
 "l4d2_gifts_chance", "40",	"Chance (%) of infected drop gift."
@@ -8,4 +43,10 @@ Drop gifts (press E to earn reward) when a special infected died
 "l4d2_gifts_probabilityS", "100", "Probability for gift special with respect to chance of infected drop gift."
 "l4d2_gifts_maxcollectMap", "0", "Maximum of gifts that all survivors can pick up per map [0 = Disabled]"
 "l4d2_gifts_maxcollectRound", "0", "Maximum of gifts that all survivors can pick up per round [0 = Disabled]"
+
+-Command-
+"sm_giftcollect", "View number of gifts collected"
+"sm_giftc", "View number of gifts collected"
+"sm_gift", "Spawn a gift in your position"
+"sm_reloadgifts", " Reload the config file of gifts (data/l4d2_gifts.cfg)"
 	

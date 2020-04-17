@@ -128,7 +128,7 @@
 #define MAX_TYPEGIFTS		2
 #define TYPE_ESTANDAR		0
 #define TYPE_SPECIAL		1
-#define MAX_SPECIALWEAPONS	32
+#define MAX_SPECIALWEAPONS	35
 
 #define TEAM_SURVIVOR		2
 #define TEAM_INFECTED		3
@@ -193,6 +193,9 @@ char weapons_name[MAX_SPECIALWEAPONS][2][50] =
 	{"sniper_awp", "AWP"},
 	{"grenade_launcher","榴彈發射器"},
 	{"rifle_m60", "M60機關槍"},
+	{"knife", "小刀"},
+	{"chainsaw", "奪魂鋸"},
+	{"baseball_bat", "球棒"},
 	{"", "空(謝謝惠顧)"}
 };
 int CurrentPointsForMap[MAXPLAYERS+1];

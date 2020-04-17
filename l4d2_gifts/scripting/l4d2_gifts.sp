@@ -11,9 +11,11 @@
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	Change Log:
-1.3.7 (17-4-2020)
-	- optimize probability drop and add all melees, weapons and items
-	- Remove database
+1.3.7 (18-4-2020)
+	- Ptimize probability drop.
+	- Add 46 gifts: all melees, weapons, items, ammo and health.
+	- Remove database.
+	- Remove pointsv collected.
 	
 1.3.6.1 (19-November-2017)
 	- Fixed the problem that you can not collect special gifts in version 1.3.6
@@ -128,7 +130,7 @@
 #define MAX_TYPEGIFTS		2
 #define TYPE_ESTANDAR		0
 #define TYPE_SPECIAL		1
-#define MAX_SPECIALWEAPONS	35
+#define MAX_SPECIALITEMS	46
 
 #define TEAM_SURVIVOR		2
 #define TEAM_INFECTED		3
@@ -160,7 +162,7 @@ ConVar cvar_gift_probabilityS;
 ConVar cvar_gift_maxcollectMap;
 ConVar cvar_gift_maxcollectRound;
 
-char weapons_name[MAX_SPECIALWEAPONS][2][50] = 
+char weapons_name[MAX_SPECIALITEMS][2][50] = 
 {
 	{"defibrillator","電擊器"},
 	{"first_aid_kit","治療包"},
@@ -193,9 +195,20 @@ char weapons_name[MAX_SPECIALWEAPONS][2][50] =
 	{"sniper_awp", "AWP"},
 	{"grenade_launcher","榴彈發射器"},
 	{"rifle_m60", "M60機關槍"},
-	{"knife", "小刀"},
-	{"chainsaw", "奪魂鋸"},
+	{"ammo", "補給彈藥"},
+	{"health", "滿血生命值"},
 	{"baseball_bat", "球棒"},
+	{"chainsaw", "奪魂鋸"},
+	{"cricket_bat", "板球拍"},
+	{"crowbar", "鐵撬"},
+	{"electric_guitar", "電吉他"},
+	{"fireaxe", "斧頭"},
+	{"frying_pan", "平底鍋"},
+	{"katana", "武士刀"},
+	{"machete", "開山刀"},
+	{"tonfa", "警棍"},
+	{"knife", "小刀"},
+	{"golfclub", "高爾夫球棒"},
 	{"", "空(謝謝惠顧)"}
 };
 int CurrentPointsForMap[MAXPLAYERS+1];
@@ -736,10 +749,10 @@ void NotifyGift(int client, int type, int gift = -1)
 			return;
 		}
 
-		int index = GetURandomIntRange(0,MAX_SPECIALWEAPONS-1);
+		int index = GetURandomIntRange(0,MAX_SPECIALITEMS-1);
 		
 		
-		if(index >= 0 && index < MAX_SPECIALWEAPONS)
+		if(index >= 0 && index < MAX_SPECIALITEMS)
 		{
 			GiveWeapon(client, weapons_name[index][0]);
 			Client_PrintToChatAll(false, "%s %t", TAG_GIFT, "Spawn Gift Special Not Points", client, weapons_name[index][1]);

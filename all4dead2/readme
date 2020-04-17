@@ -1,4 +1,8 @@
-Enables admins to have control over the AI Director without using sv_cheats 1
+Enables admins to have control over the AI Director and spawn all melees, weapons and items without using sv_cheats 1
+
+-Require-
+To unlock all melee weapons in all official campaigns, you MUST get the [Melee Spawn Control extension](https://forums.alliedmods.net/showthread.php?t=222535).
+OR use the [Mission and Weapons - Info Editor]("https://forums.alliedmods.net/showthread.php?t=310586") plugin which supersedes the extension.
 
 -Convars-
 "a4d_always_force_bosses", 		"0", 	"Whether or not bosses will be forced to spawn all the time."

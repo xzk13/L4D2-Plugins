@@ -1,39 +1,56 @@
 Drop gifts (press E to earn reward) when a special infected died
--Items that could drop-
-{"defibrillator","電擊器"}
-{"first_aid_kit","治療包"}
-{"pain_pills", "止痛藥丸"}
-{"adrenaline", "腎上腺素"}
-{"molotov", "火瓶"}
-{"pipe_bomb", "土製炸彈"}
-{"vomitjar", "膽汁"}
-{"gascan","汽油"}
-{"propanetank", "瓦斯桶"}
-{"oxygentank", "氧氣罐"}
-{"weapon_upgradepack_incendiary", "火焰包"}
-{"weapon_upgradepack_explosive","高爆彈"}
-{"pistol","手槍"}
-{"pistol_magnum", "沙漠之鷹"}
-{"pumpshotgun", "木製霰彈槍"}
-{"shotgun_chrome", "鐵製霰彈槍"}
-{"smg", "機槍"}
-{"smg_silenced", "消音機槍"}
-{"smg_mp5","MP5衝鋒槍"}
-{"rifle", "步槍"}
-{"rifle_sg552", "SG552步槍"}
-{"rifle_ak47", "AK47"}
-{"rifle_desert","三連發步槍"}
-{"shotgun_spas","戰鬥霰彈槍"}
-{"autoshotgun", "連發霰彈槍"}
-{"hunting_rifle", "狙擊槍"}
-{"sniper_military", "軍用狙擊槍"}
-{"sniper_scout", "SCOUT狙擊槍"}
-{"sniper_awp", "AWP"}
-{"grenade_launcher","榴彈發射器"}
-{"rifle_m60", "M60機關槍"}
-{"knife", "小刀"}
-{"chainsaw", "奪魂鋸"}
-{"baseball_bat", "球棒"}
+
+-46 items that could drop-
+{"defibrillator","電擊器"},
+{"first_aid_kit","治療包"},
+{"pain_pills", "止痛藥丸"},
+{"adrenaline", "腎上腺素"},
+{"molotov", "火瓶"},
+{"pipe_bomb", "土製炸彈"},
+{"vomitjar", "膽汁"},
+{"gascan","汽油"},
+{"propanetank", "瓦斯桶"},
+{"oxygentank", "氧氣罐"},
+{"weapon_upgradepack_incendiary", "火焰包"},
+{"weapon_upgradepack_explosive","高爆彈"},
+{"pistol","手槍"},
+{"pistol_magnum", "沙漠之鷹"},
+{"pumpshotgun", "木製霰彈槍"},
+{"shotgun_chrome", "鐵製霰彈槍"},
+{"smg", "機槍"},
+{"smg_silenced", "消音機槍"},
+{"smg_mp5","MP5衝鋒槍"},
+{"rifle", "步槍"},
+{"rifle_sg552", "SG552步槍"},
+{"rifle_ak47", "AK47"},
+{"rifle_desert","三連發步槍"},
+{"shotgun_spas","戰鬥霰彈槍"},
+{"autoshotgun", "連發霰彈槍"},
+{"hunting_rifle", "狙擊槍"},
+{"sniper_military", "軍用狙擊槍"},
+{"sniper_scout", "SCOUT狙擊槍"},
+{"sniper_awp", "AWP"},
+{"grenade_launcher","榴彈發射器"},
+{"rifle_m60", "M60機關槍"},
+{"ammo", "補給彈藥"},
+{"health", "滿血生命值"},
+{"baseball_bat", "球棒"},
+{"chainsaw", "奪魂鋸"},
+{"cricket_bat", "板球拍"},
+{"crowbar", "鐵撬"},
+{"electric_guitar", "電吉他"},
+{"fireaxe", "斧頭"},
+{"frying_pan", "平底鍋"},
+{"katana", "武士刀"},
+{"machete", "開山刀"},
+{"tonfa", "警棍"},
+{"knife", "小刀"},
+{"golfclub", "高爾夫球棒"},
+{"", "空(謝謝惠顧)"}
+
+-Require-
+To unlock all melee weapons in all official campaigns, you MUST get the [Melee Spawn Control extension](https://forums.alliedmods.net/showthread.php?t=222535).
+OR use the [Mission and Weapons - Info Editor]("https://forums.alliedmods.net/showthread.php?t=310586") plugin which supersedes the extension.
 
 -Convars-
 "l4d2_gifts_enabled",	"1", "Enable gifts 0: Disable, 1: Enable"

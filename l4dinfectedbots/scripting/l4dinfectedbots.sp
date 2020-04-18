@@ -4452,6 +4452,8 @@ public OnPluginEnd()
 	ResetConVar(FindConVar("z_spawn_safety_range"), true, true);
 	ResetConVar(FindConVar("z_spawn_flow_limit"), true, true);
 	//ResetConVar(FindConVar("z_max_player_zombies"), true, true);
+	ResetConVar(h_MaxPlayerZombies, true, true);
+	ResetConVar(FindConVar("z_tank_health"), true, true);
 	if (!L4D2Version)
 		ResetConVar(FindConVar("sb_all_bot_team"), true, true);
 	else

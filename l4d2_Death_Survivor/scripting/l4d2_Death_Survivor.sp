@@ -109,17 +109,7 @@ public Action Event_PlayerSpawn(Handle event, const char[] name, bool dontBroadc
 		g_bEnable == false) //disable this plugin
 		return Plugin_Continue;
 		
-	char sModelName[PLATFORM_MAX_PATH];
-	GetClientModel(client, sModelName, sizeof(sModelName));
-	#if DEBUG
-		PrintToChatAll("Event_PlayerDeath: %N - sModelName: %s",client,sModelName);
-	#endif
-	
-	ModelID modelId = GetModelID(sModelName);
-	if(bDeath_Model[modelId] == true)
-	{
-		CreateTimer(1.0,Timer_KeepPlayerDeath,client,TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
-	}
+	CreateTimer(1.0,Timer_KeepPlayerDeath,client,TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	
 	return Plugin_Continue;
 }
@@ -130,8 +120,17 @@ public Action Timer_KeepPlayerDeath(Handle timer,int client)
 	
 	if(IsPlayerAlive(client))
 	{
-		ForcePlayerSuicide(client);
-		//CPrintToChat(client,"[{olive}水仙摸魚{default}] {green}Surprise Dead, Mother Fucker!");
+		char sModelName[PLATFORM_MAX_PATH];
+		GetClientModel(client, sModelName, sizeof(sModelName));
+		#if DEBUG
+			PrintToChatAll("Event_PlayerSpawn -> Timer_KeepPlayerDeath: %N - sModelName: %s",client,sModelName);
+		#endif
+		ModelID modelId = GetModelID(sModelName);
+		if(bDeath_Model[modelId] == true)
+		{
+			ForcePlayerSuicide(client);
+			//CPrintToChat(client,"[{olive}水仙摸魚{default}] {green}Surprise Dead, Mother Fucker!");
+		}
 	}
 	else
 		return Plugin_Stop;

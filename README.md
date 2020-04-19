@@ -1,6 +1,6 @@
 # L4D2-Plugins by Harry Potter
 L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun plugins.
->All plugins in here only apply to L4D2 (last edited:2020/4/19)
+>All plugins in here only apply to L4D2 (last edited:2020/4/20)
 # Require
 * Clean Servers:
   * [Sourcemod 1.8](https://www.sourcemod.net/downloads.php?branch=1.8-dev) (or newer), [Metamod](https://www.metamodsource.net/downloads.php?branch=stable)
@@ -21,6 +21,7 @@ L4D2 Competitive enhancement, bug/glitch fixes, general purpose and freaky-fun p
 * <b>l4d2_gifts</b>: Drop gifts (press E to earn reward) when a special infected died
 * <b>kills</b>: show statistics of surviviors (kill S.I, C.I. and FF)on round end
 * <b>l4d2_Death_Survivor</b>: If a player die as a survivor, this model survior bot keep death until map change or server shutdown
+* <b>l4d2_change_m1</b>: If all Survivors die, change level to the current map m1 (coop only)
 # Scripting Compiler
 * [sourcemod 1.8](https://github.com/fbef0102/L4D2-Plugins/releases/download/v1.0/sourcemod_1.8_Compiler.zip) compiler: sourcemod v1.8.0.5977 scripting
 # Others

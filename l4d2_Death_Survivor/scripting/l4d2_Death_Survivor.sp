@@ -34,7 +34,7 @@ public Plugin:myinfo =
 	name = "L4D2 death survivor",
 	author = "Harry Potter",
 	description = "If a player die as a survivor, this model survior bot keep death until map change or server shutdown",
-	version = "1.0",
+	version = "1.1",
 	url = "Harry Potter myself,you bitch shit"
 };
 
@@ -90,10 +90,21 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 		g_bEnable == false) //disable this plugin
 		return Plugin_Continue;
 
+	CreateTimer(1.0,Timer_CheckPlayerDeath,client,TIMER_FLAG_NO_MAPCHANGE);
+	
+	return Plugin_Continue;
+}
+
+public Action Timer_CheckPlayerDeath(Handle timer,int client)
+{
+	if (!IsClientSurvivorIndex(client)||
+		IsPlayerAlive(client))
+		return Plugin_Continue;
+		
 	char sModelName[PLATFORM_MAX_PATH];
 	GetClientModel(client, sModelName, sizeof(sModelName));
 	#if DEBUG
-		PrintToChatAll("Event_PlayerDeath: %N - sModelName: %s",client,sModelName);
+		PrintToChatAll("Event_PlayerDeath 1.0 timer check: %N - sModelName: %s",client,sModelName);
 	#endif
 	
 	ModelID modelId = GetModelID(sModelName);
@@ -109,7 +120,11 @@ public Action Event_PlayerSpawn(Handle event, const char[] name, bool dontBroadc
 		g_bEnable == false) //disable this plugin
 		return Plugin_Continue;
 		
-	CreateTimer(1.0,Timer_KeepPlayerDeath,client,TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+	#if DEBUG
+		PrintToChatAll("Event_PlayerSpawn: %N",client);
+	#endif	
+	
+	CreateTimer(3.0,Timer_KeepPlayerDeath,client,TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	
 	return Plugin_Continue;
 }
@@ -123,7 +138,7 @@ public Action Timer_KeepPlayerDeath(Handle timer,int client)
 		char sModelName[PLATFORM_MAX_PATH];
 		GetClientModel(client, sModelName, sizeof(sModelName));
 		#if DEBUG
-			PrintToChatAll("Event_PlayerSpawn -> Timer_KeepPlayerDeath: %N - sModelName: %s",client,sModelName);
+			PrintToChatAll("Timer_KeepPlayerDeath: %N - sModelName: %s",client,sModelName);
 		#endif
 		ModelID modelId = GetModelID(sModelName);
 		if(bDeath_Model[modelId] == true)
@@ -131,9 +146,15 @@ public Action Timer_KeepPlayerDeath(Handle timer,int client)
 			ForcePlayerSuicide(client);
 			//CPrintToChat(client,"[{olive}水仙摸魚{default}] {green}Surprise Dead, Mother Fucker!");
 		}
+		else
+		{
+			return Plugin_Stop;
+		}
 	}
 	else
+	{
 		return Plugin_Stop;
+	}
 
 	return Plugin_Continue;
 }
@@ -155,7 +176,7 @@ public Action Event_OnBotSwap(Handle event, const char[] name, bool dontBroadcas
 	{
 		GetClientModel(bot, sModelName, sizeof(sModelName));
 		#if DEBUG
-			PrintToChatAll("Event_BotReplacePlayer: %N - sModelName: %s",bot,sModelName);
+			PrintToChatAll("When a bot replaces a player: %N - sModelName: %s",bot,sModelName);
 		#endif
 		client = bot;
 	}
@@ -163,16 +184,12 @@ public Action Event_OnBotSwap(Handle event, const char[] name, bool dontBroadcas
 	{
 		GetClientModel(player, sModelName, sizeof(sModelName));
 		#if DEBUG
-			PrintToChatAll("Event_BotReplacePlayer: %N - sModelName: %s",player,sModelName);
+			PrintToChatAll("player joins survivors team: %N - sModelName: %s",player,sModelName);
 		#endif
 		client = player;
 	}
 		
-	ModelID modelId = GetModelID(sModelName);
-	if(bDeath_Model[modelId] == true)
-	{
-		CreateTimer(1.0,Timer_KeepPlayerDeath,client,TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
-	}
+	CreateTimer(3.0,Timer_KeepPlayerDeath,client,TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	
 	return Plugin_Continue;
 }

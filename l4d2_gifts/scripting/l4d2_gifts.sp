@@ -1,4 +1,4 @@
-#define PLUGIN_VERSION		"1.3.7"
+#define PLUGIN_VERSION		"1.3.8"
 
 /*
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -11,6 +11,9 @@
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	Change Log:
+1.3.8 (21-4-2020)
+	- Witch will also drop gift
+	
 1.3.7 (18-4-2020)
 	- Ptimize probability drop.
 	- Add 46 gifts: all melees, weapons, items, ammo and health.
@@ -248,7 +251,7 @@ public Plugin myinfo =
 {
 	name = "[L4D2] Gifts Drop & Spawn",
 	author = "Aceleraci�n & Harry Potter",
-	description = "Drop gifts (press E to earn reward) when a special infected died",
+	description = "Drop gifts (press E to earn reward) when a special infected or a witch killed by survivor.",
 	version = PLUGIN_VERSION,
 	url = "https://forums.alliedmods.net/showthread.php?t=302731"
 }
@@ -289,6 +292,7 @@ public void OnPluginStart()
 	HookEvent("round_end", Event_RoundEnd);
 	HookEvent("player_death", Event_PlayerDeath);
 	HookEvent("player_use", Event_PlayerUse);
+	HookEvent("witch_killed", OnWitchKilled);
 	
 	HookConVarChange(cvar_gift_enable, Cvar_Changed1);
 	HookConVarChange(cvar_gift_life,	Cvar_Changed2);
@@ -636,6 +640,19 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 	}
 }
 
+public Action OnWitchKilled(Event event, const char[] name, bool dontBroadcast)
+{
+	int attacker = GetClientOfUserId(GetEventInt(event, "userid"));
+	int witch = GetEventInt(event, "witchid");
+	if (IsValidClient(attacker) && GetClientTeam(attacker) == 2)
+	{
+		if (GetRandomInt(1, 100) < iGiftChance)
+		{
+			DropGift(witch);
+		}
+	}
+}
+
 // When a Survivor presses +USE on gifts physics
 public Action Event_PlayerUse(Event event, const char[] name, bool dontBroadcast)
 {
@@ -936,7 +953,7 @@ int Infected_Admitted(int client)
 {
 	int class = GetEntProp(client, Prop_Send, "m_zombieClass");
 	
-	if(class == 1 || class == 2 || class == 3 || class == 4 || class == 5 || class == 6)
+	if(class == 1 || class == 2 || class == 3 || class == 4 || class == 5 || class == 6 || class == 7)
 	{
 		return class;
 	}

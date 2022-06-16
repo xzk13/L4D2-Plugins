@@ -23,7 +23,7 @@ ConVar g_hItemHintCoolDown, g_hSpotMarkCoolDown, g_hInfectedMarkCoolDown,
 	g_hItemInstructorHint, g_hItemInstructorColor, g_hItemInstructorIcon,
 	g_hSpotMarkUseRange, g_hSpotMarkUseSound, g_hSpotMarkGlowTimer, g_hSpotMarkCvarColor, g_hSpotMarkSpriteModel,
 	g_hSpotMarkInstructorHint, g_hSpotMarkInstructorColor, g_hSpotMarkInstructorIcon,
-	g_hInfectedMarkUseRange, g_hInfectedMarkUseSound, g_hInfectedMarkAnnounceType, g_hInfectedMarkGlowTimer, g_hInfectedMarkGlowRange, g_hInfectedMarkCvarColor, g_hInfectedMarkWitch;
+	g_hInfectedMarkUseRange, g_hInfectedMarkUseSound, g_hInfectedMarkAnnounceType, g_hInfectedMarkGlowTimer, g_hInfectedMarkGlowRange, g_hInfectedMarkCvarColor, g_hInfectedMarkWitch, g_hInfectedMarkInstructorHint, g_hInfectedMarkInstructorColor, g_hInfectedMarkInstructorIcon;
 int g_iItemAnnounceType, g_iItemGlowRange, g_iItemCvarColor,
 	g_iSpotMarkCvarColorArray[3],
 	g_iInfectedMarkAnnounceType, g_iInfectedMarkGlowRange, g_iInfectedMarkCvarColor;
@@ -33,8 +33,8 @@ float g_fItemHintCoolDown, g_fSpotMarkCoolDown, g_fInfectedMarkCoolDown,
 	g_fInfectedMarkUseRange, g_fInfectedMarkGlowTimer;
 float       g_fItemHintCoolDownTime[MAXPLAYERS + 1], g_fSpotMarkCoolDownTime[MAXPLAYERS + 1], g_fInfectedMarkCoolDownTime[MAXPLAYERS + 1];
 static char g_sItemInstructorColor[12], g_sItemInstructorIcon[16], g_sSpotMarkCvarColor[12], g_sItemUseSound[100], g_sSpotMarkUseSound[100], g_sKillDelay[32],
-			g_sInfectedMarkUseSound[100], g_sSpotMarkInstructorColor[12], g_sSpotMarkInstructorIcon[16], g_sSpotMarkSpriteModel[PLATFORM_MAX_PATH];
-bool g_bItemInstructorHint, g_bSpotMarkInstructorHint, g_bInfectedMarkWitch;
+			g_sInfectedMarkInstructorColor[12], g_sInfectedMarkInstructorIcon[16], g_sInfectedMarkUseSound[100], g_sSpotMarkInstructorColor[12], g_sSpotMarkInstructorIcon[16], g_sSpotMarkSpriteModel[PLATFORM_MAX_PATH];
+bool g_bItemInstructorHint, g_bSpotMarkInstructorHint, g_bInfectedMarkInstructorHint, g_bInfectedMarkWitch;
 
 
 static bool   ge_bMoveUp[MAXENTITIES+1];
@@ -47,6 +47,7 @@ Handle    g_iTargetInstructorTimer[MAXENTITIES+1] = {null};
 Handle    g_hUseEntity;
 StringMap g_smModelToName;
 StringMap g_smModelHeight;
+StringMap g_smModelToIcon;
 bool g_bMapStarted;
 
 enum EHintType {
@@ -60,7 +61,7 @@ public Plugin myinfo =
 	name        = "L4D2 Item hint",
 	author      = "BHaType, fdxx, HarryPotter",
 	description = "When using 'Look' in vocalize menu, print corresponding item to chat area and make item glow or create spot marker/infeced maker like back 4 blood.",
-	version     = "2.0",
+	version     = "2.0.Z.1",
 	url         = "https://forums.alliedmods.net/showpost.php?p=2765332&postcount=30"
 };
 
@@ -121,7 +122,7 @@ public void OnPluginStart()
 	g_hItemAnnounceType		= CreateConVar("l4d2_item_hint_announce_type", "1", "Changes how Item Hint displays. (0: Disable, 1:In chat, 2: In Hint Box, 3: In center text)", FCVAR_NOTIFY, true, 0.0, true, 3.0);
 	g_hItemGlowTimer		= CreateConVar("l4d2_item_hint_glow_timer", "10.0", "Item Glow Time.", FCVAR_NOTIFY, true, 0.0);
 	g_hItemGlowRange		= CreateConVar("l4d2_item_hint_glow_range", "800", "Item Glow Range.", FCVAR_NOTIFY, true, 0.0);
-	g_hItemCvarColor		= CreateConVar("l4d2_item_hint_glow_color", "0 255 255", "Item Glow Color, Three values between 0-255 separated by spaces. (Empty = Disable Item Glow)", FCVAR_NOTIFY);
+	g_hItemCvarColor		= CreateConVar("l4d2_item_hint_glow_color", "50 205 50", "Item Glow Color, Three values between 0-255 separated by spaces. (Empty = Disable Item Glow)", FCVAR_NOTIFY);
 	g_hItemInstructorHint	= CreateConVar("l4d2_item_instructorhint_enable", "1", "If 1, Create instructor hint on marked item.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hItemInstructorColor	= CreateConVar("l4d2_item_instructorhint_color", "0 255 255", "Instructor hint color on marked item.", FCVAR_NOTIFY);
 	g_hItemInstructorIcon	= CreateConVar("l4d2_item_instructorhint_icon", "icon_interact", "Instructor icon name on marked item. (For more icons: https://developer.valvesoftware.com/wiki/Env_instructor_hint)", FCVAR_NOTIFY);
@@ -142,8 +143,12 @@ public void OnPluginStart()
 	g_hInfectedMarkAnnounceType	= CreateConVar("l4d2_infected_marker_announce_type", "1", "Changes how infected marker hint displays. (0: Disable, 1:In chat, 2: In Hint Box, 3: In center text)", FCVAR_NOTIFY, true, 0.0, true, 3.0);
 	g_hInfectedMarkGlowTimer   	= CreateConVar("l4d2_infected_marker_glow_timer", "10.0", "Infected Marker Glow Time.", FCVAR_NOTIFY, true, 0.0);
 	g_hInfectedMarkGlowRange   	= CreateConVar("l4d2_infected_marker_glow_range", "2500", "Infected Marker Glow Range", FCVAR_NOTIFY, true, 0.0);
-	g_hInfectedMarkCvarColor   	= CreateConVar("l4d2_infected_marker_glow_color", "255 120 203", "Infected Marker Glow Color, Three values between 0-255 separated by spaces. (Empty = Disable Infected Marker)", FCVAR_NOTIFY);
+	g_hInfectedMarkCvarColor   	= CreateConVar("l4d2_infected_marker_glow_color", "139 0 0", "Infected Marker Glow Color, Three values between 0-255 separated by spaces. (Empty = Disable Infected Marker)", FCVAR_NOTIFY);
 	g_hInfectedMarkWitch    	= CreateConVar("l4d2_infected_marker_witch_enable", "1", "If 1, Enable 'Look' Infected Marker on witch.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	g_hInfectedMarkInstructorHint	= CreateConVar("l4d2_infected_marker_instructorhint_enable", "1", "If 1, Create instructor hint on Infected Marker.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	g_hInfectedMarkInstructorColor	= CreateConVar("l4d2_infected_marker_instructorhint_color", "200 200 200", "Instructor hint color on Infected Marker.", FCVAR_NOTIFY);
+	g_hInfectedMarkInstructorIcon	= CreateConVar("l4d2_infected_marker_instructorhint_icon", "icon_alert", "Instructor icon name on Infected Marker.", FCVAR_NOTIFY);
+	
 	
 	AutoExecConfig(true, "l4d2_item_hint");
 
@@ -177,6 +182,9 @@ public void OnPluginStart()
 	g_hInfectedMarkGlowRange.AddChangeHook(ConVarChanged_Cvars);
 	g_hInfectedMarkCvarColor.AddChangeHook(ConVarChanged_Cvars);
 	g_hInfectedMarkWitch.AddChangeHook(ConVarChanged_Cvars);
+	g_hInfectedMarkInstructorHint.AddChangeHook(ConVarChanged_Cvars);	
+	g_hInfectedMarkInstructorColor.AddChangeHook(ConVarChanged_Cvars);	
+	g_hInfectedMarkInstructorIcon.AddChangeHook(ConVarChanged_Cvars);	
 	
 	HookEvent("round_start", Event_RoundStart);
 	HookEvent("round_end", Event_Round_End);
@@ -260,6 +268,11 @@ void GetCvars()
 	g_hInfectedMarkCvarColor.GetString(sColor, sizeof(sColor));
 	g_iInfectedMarkCvarColor = GetColor(sColor);
 	g_bInfectedMarkWitch = g_hInfectedMarkWitch.BoolValue;
+	g_bInfectedMarkInstructorHint = g_hInfectedMarkInstructorHint.BoolValue;
+	g_hInfectedMarkInstructorColor.GetString(g_sInfectedMarkInstructorColor, sizeof(g_sInfectedMarkInstructorColor));
+	TrimString(g_sInfectedMarkInstructorColor);
+	g_hInfectedMarkInstructorIcon.GetString(g_sInfectedMarkInstructorIcon, sizeof(g_sInfectedMarkInstructorIcon));
+
 }
 
 void CreateStringMap()
@@ -324,6 +337,7 @@ void CreateStringMap()
 	g_smModelToName.SetString("models/weapons/melee/w_golfclub.mdl", "Golf Club!");
 	g_smModelToName.SetString("models/weapons/melee/w_pitchfork.mdl", "Pitckfork!");
 	g_smModelToName.SetString("models/weapons/melee/w_shovel.mdl", "Shovel");
+	g_smModelToName.SetString("models/weapons/melee/w_riotshield.mdl", "Shield!");
 	g_smModelToName.SetString("models/infected/boomette.mdl", "Boomer!");
 	g_smModelToName.SetString("models/infected/boomer.mdl", "Boomer!");
 	g_smModelToName.SetString("models/infected/boomer_l4d1.mdl", "Boomer!");
@@ -400,6 +414,68 @@ void CreateStringMap()
 	g_smModelHeight.SetValue("models/weapons/melee/w_golfclub.mdl", 5.0);
 	g_smModelHeight.SetValue("models/weapons/melee/w_pitchfork.mdl", 5.0);
 	g_smModelHeight.SetValue("models/weapons/melee/w_shovel.mdl", 5.0);
+	g_smModelHeight.SetValue("models/weapons/melee/w_riotshield.mdl", 5.0);
+
+	g_smModelToIcon = new StringMap();
+
+	g_smModelToIcon.SetString("models/w_models/weapons/w_eq_medkit.mdl",				"icon_equip_medkit");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_eq_defibrillator.mdl",			"icon_defibrillator");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_eq_painpills.mdl",				"icon_equip_pills");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_eq_adrenaline.mdl",			"icon_adrenaline");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_eq_bile_flask.mdl",			"tip_boomer_bile");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_eq_molotov.mdl",				"icon_equip_molotov");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_eq_pipebomb.mdl",				"icon_equip_pipebomb");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_laser_sights.mdl",				"icon_laser_sight");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_eq_incendiary_ammopack.mdl",	"icon_incendiary_ammo");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_eq_explosive_ammopack.mdl",	"icon_explosive_ammo");
+	g_smModelToIcon.SetString("models/props/terror/exploding_ammo.mdl", 				"icon_explosive_ammo");
+	g_smModelToIcon.SetString("models/props/terror/incendiary_ammo.mdl", 				"icon_incendiary_ammo");
+	g_smModelToIcon.SetString("models/props/terror/ammo_stack.mdl", 					"icon_ammo");
+	g_smModelToIcon.SetString("models/props_unique/spawn_apartment/coffeeammo.mdl", 	"icon_ammo");
+	g_smModelToIcon.SetString("models/props/de_prodigy/ammo_can_02.mdl", 				"icon_ammo");
+	g_smModelToIcon.SetString("models/weapons/melee/w_chainsaw.mdl", 					"icon_chainsaw");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_pistol_a.mdl", 				"icon_pistol");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_pistol_b.mdl", 				"icon_pistol");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_desert_eagle.mdl", 			"icon_deagle");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_shotgun.mdl", 					"icon_equip_pumpshotgun");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_pumpshotgun_A.mdl", 			"icon_equip_pumpshotgun");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_smg_uzi.mdl", 					"icon_equip_uzi");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_smg_a.mdl", 					"icon_equip_silencedsmg");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_smg_mp5.mdl", 					"icon_equip_uzi");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_rifle_m16a2.mdl", 				"icon_equip_machinegun");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_rifle_sg552.mdl", 				"icon_equip_machinegun");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_rifle_ak47.mdl", 				"icon_equip_machinegun");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_desert_rifle.mdl", 			"icon_equip_machinegun");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_shotgun_spas.mdl", 			"icon_equip_spasshotgun");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_autoshot_m4super.mdl", 		"icon_equip_autoshotgun");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_sniper_mini14.mdl", 			"icon_equip_rifle");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_sniper_military.mdl", 			"icon_equip_militarysniper");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_sniper_scout.mdl", 			"icon_equip_rifle");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_sniper_awp.mdl", 				"icon_equip_militarysniper");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_grenade_launcher.mdl", 		"icon_equip_grenadelauncher");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_m60.mdl", 						"icon_equip_machinegun");
+	g_smModelToIcon.SetString("models/props_junk/gascan001a.mdl", 						"icon_gas_can");
+	g_smModelToIcon.SetString("models/props_junk/explosive_box001.mdl", 				"itempickup_background");
+	g_smModelToIcon.SetString("models/props_junk/propanecanister001a.mdl", 				"itempickup_background");
+	g_smModelToIcon.SetString("models/props_equipment/oxygentank01.mdl", 				"itempickup_background");
+	g_smModelToIcon.SetString("models/props_junk/gnome.mdl", 							"itempickup_background");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_cola.mdl", 					"icon_cola_bottles");
+	g_smModelToIcon.SetString("models/w_models/weapons/50cal.mdl",						"icon_equip_desertrifle");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_minigun.mdl", 					"icon_equip_desertrifle");
+	g_smModelToIcon.SetString("models/w_models/weapons/w_knife_t.mdl", 					"icon_knife");
+	g_smModelToIcon.SetString("models/weapons/melee/w_bat.mdl", 						"icon_baseball_bat");
+	g_smModelToIcon.SetString("models/weapons/melee/w_cricket_bat.mdl", 				"icon_cricket_bat");
+	g_smModelToIcon.SetString("models/weapons/melee/w_crowbar.mdl", 					"icon_crowbar");
+	g_smModelToIcon.SetString("models/weapons/melee/w_electric_guitar.mdl", 			"icon_guitar");
+	g_smModelToIcon.SetString("models/weapons/melee/w_fireaxe.mdl", 					"icon_fireaxe");
+	g_smModelToIcon.SetString("models/weapons/melee/w_frying_pan.mdl", 					"icon_frying_pan");
+	g_smModelToIcon.SetString("models/weapons/melee/w_katana.mdl", 						"icon_katana");
+	g_smModelToIcon.SetString("models/weapons/melee/w_machete.mdl", 					"icon_machete");
+	g_smModelToIcon.SetString("models/weapons/melee/w_tonfa.mdl", 						"icon_tonfa");
+	g_smModelToIcon.SetString("models/weapons/melee/w_golfclub.mdl", 					"icon_golfclub");
+	g_smModelToIcon.SetString("models/weapons/melee/w_pitchfork.mdl", 					"tip_melee");
+	g_smModelToIcon.SetString("models/weapons/melee/w_shovel.mdl", 						"tip_melee");
+	g_smModelToIcon.SetString("models/weapons/melee/w_riotshield.mdl", 					"icon_shield");
 }
 
 int g_iFieldModelIndex;
@@ -593,9 +669,16 @@ public Action Vocalize_Listener(int client, const char[] command, int argc)
 									if(g_bItemInstructorHint)
 									{
 										float vEndPos[3];
+										char sItemIcon[32];
+										if(StringToInt(g_sItemInstructorIcon) == -1){
+											g_smModelToIcon.GetString(sEntModelName, sItemIcon, sizeof(sItemIcon));
+										}else{
+											sItemIcon = g_sItemInstructorIcon;
+										}
 										GetEntPropVector(iEntity, Prop_Send, "m_vecOrigin", vEndPos);
 										vEndPos[2] = vEndPos[2] + fHeight;
-										CreateInstructorHint(client, vEndPos, sItemName, iEntity, view_as<EHintType>(eItemHint));
+										
+										CreateInstructorHint(client, vEndPos, sItemName, sItemIcon, iEntity, eItemHint);
 									}
 								}
 								
@@ -865,11 +948,23 @@ bool CreateInfectedMarker(int client, int infected, bool bIsWitch = false)
 			EmitSoundToClient(target, g_sInfectedMarkUseSound, client);
 		}
 	}
-	
+
 	static char sItemName[64];
 	StringToLowerCase(sModelName);
 	g_smModelToName.GetString(sModelName, sItemName, sizeof(sItemName));
 	NotifyMessage(client, sItemName, view_as<EHintType>(eInfectedMaker));
+
+	if ( g_bInfectedMarkInstructorHint ){
+		char sInfectedIcon[16], sNetClassName[32];
+		if(StringToInt(g_sInfectedMarkInstructorIcon) == -1){
+			GetEntityNetClass(infected, sNetClassName, sizeof(sNetClassName));
+			sNetClassName[0] = CharToLower(sNetClassName[0]);
+			FormatEx(sInfectedIcon, sizeof(sInfectedIcon),"tip_%s", sNetClassName);
+		}else{
+			sInfectedIcon = g_sInfectedMarkInstructorIcon;
+		}
+		CreateInstructorHint(client, vEndPos, sItemName, sInfectedIcon, infected, eInfectedMaker);
+	} 
 	
 	return true;
 }
@@ -912,7 +1007,7 @@ void CreateSpotMarker(int client, int clientAim = 0, bool bIsAimInfeced)
 	if (!hit)    // not hit
 		return;
 
-	if ( g_bSpotMarkInstructorHint ) CreateInstructorHint(client, vEndPos, "", 0, view_as<EHintType>(eSpotMarker));
+	if ( g_bSpotMarkInstructorHint ) CreateInstructorHint(client, vEndPos, "", "", 0, view_as<EHintType>(eSpotMarker));
 
 	if ( strlen(g_sSpotMarkCvarColor) == 0 ) return; //disable spot mark glow
 
@@ -1332,41 +1427,49 @@ bool CheckIfEntityMax(int entity)
 }
 
 // by BHaType: https://forums.alliedmods.net/showthread.php?p=2709810#post2709810
-void CreateInstructorHint(int client, const float vOrigin[3], const char[] sItemName, int iEntity, EHintType type)
+void CreateInstructorHint(int client, const float vOrigin[3], const char[] sItemName, const char[] sIconName, int iEntity, EHintType type)
 {
 	static char sTargetName[64], sCaption[128];
 	Format(sTargetName, sizeof sTargetName, "%i_%.0f", client, GetEngineTime());
 	
 	switch(type)
 	{
-		case view_as<EHintType>(eItemHint):
+		case eItemHint:
 		{
-			if( Create_info_target(iEntity, vOrigin, sTargetName, g_fItemGlowTimer) )
-			{
-				FormatEx(sCaption, sizeof sCaption, "%s", sItemName);
-				Create_env_instructor_hint(iEntity, view_as<EHintType>(eItemHint), vOrigin, sTargetName, g_sItemInstructorIcon, sCaption, g_sItemInstructorColor, g_fItemGlowTimer, float(g_iItemGlowRange));
-			}
+			FormatEx(sCaption, sizeof sCaption, "%s", sItemName);
+			//Create_env_instructor_hint(iEntity, view_as<EHintType>(eItemHint), vOrigin, sTargetName, g_sItemInstructorIcon, sCaption, g_sItemInstructorColor, g_fItemGlowTimer, float(g_iItemGlowRange));
+			ShowInstructorHintTarget(iEntity, sCaption, sIconName, "",  g_sItemInstructorColor, RoundToZero(g_fItemGlowTimer), 0.0, float(g_iItemGlowRange), 0);
+			
 		}
-		case view_as<EHintType>(eSpotMarker):
+		case eSpotMarker:
 		{
-			if( Create_info_target(iEntity, vOrigin, sTargetName, g_fSpotMarkGlowTimer) )
+			int target = Create_info_target(iEntity, vOrigin, sTargetName, g_fSpotMarkGlowTimer);
+			if(target > 0)
 			{
 				FormatEx(sCaption, sizeof sCaption, "%N Marked something here", client);
 				Create_env_instructor_hint(iEntity, view_as<EHintType>(eSpotMarker), vOrigin, sTargetName, g_sSpotMarkInstructorIcon, sCaption, g_sSpotMarkInstructorColor, g_fSpotMarkGlowTimer, g_fSpotMarkUseRange);
+				//ShowInstructorHintTarget(target, sCaption, g_sSpotMarkInstructorIcon, "", g_sSpotMarkInstructorColor, RoundToZero(g_fSpotMarkGlowTimer), 10.0, g_fSpotMarkUseRange, 0);//buged no show on "info_target"
 			}
+		}
+		case eInfectedMaker:
+		{
+			FormatEx(sCaption, sizeof sCaption, "%s", sItemName);
+			//Create_env_instructor_hint(iEntity, view_as<EHintType>(eItemHint), vOrigin, sTargetName, g_sItemInstructorIcon, sCaption, g_sItemInstructorColor, g_fItemGlowTimer, float(g_iItemGlowRange));
+			ShowInstructorHintTarget(iEntity, sCaption, sIconName, "",  g_sInfectedMarkInstructorColor, RoundToZero(g_fInfectedMarkGlowTimer), 0.0, g_fInfectedMarkUseRange, 0);
+			
 		}
 	}
 }
 
-bool Create_info_target(int iEntity, const float vOrigin[3], const char[] sTargetName, float duration)
+int Create_info_target(int iEntity, const float vOrigin[3], const char[] sTargetName, float duration)
 {
 	int entity = CreateEntityByName(CLASSNAME_INFO_TARGET);
 	if (!CheckIfEntityMax(entity)) return false;
 	
 	DispatchKeyValue(entity, "targetname", sTargetName);
-	DispatchKeyValue(entity, "spawnflags", "1"); //Only visible to survivors
+	DispatchKeyValue(entity, "spawnflags", "2"); //Only visible to survivors
+	DispatchKeyValueVector(entity, "origin", vOrigin);
 	DispatchSpawn(entity);
-	TeleportEntity(entity, vOrigin, NULL_VECTOR, NULL_VECTOR);
 	SetVariantString("!activator");
 	AcceptEntityInput(entity, "SetParent", iEntity);    // We need parent the entity to an info_target_instructor_hint, otherwise it won't follow moveable item such as gascan
 	
@@ -1391,7 +1494,7 @@ bool Create_info_target(int iEntity, const float vOrigin[3], const char[] sTarge
 		AcceptEntityInput(entity, "FireUser1");
 	}
 
-	return true;
+	return entity;
 }
 
 void Create_env_instructor_hint(int iEntity, EHintType eType, const float vOrigin[3], const char[] sTargetName, const char[] icon_name, const char[] caption, const char[] hint_color, float duration, float range)
@@ -1443,6 +1546,34 @@ void Create_env_instructor_hint(int iEntity, EHintType eType, const float vOrigi
 	}
 }
 
+//don't show with "info_target" entity
+stock void ShowInstructorHintTarget(int target, const char[] caption, const char[] icon = "", const char[] binding = "", const char[] color = "255,255,255",  int timeout = 1, float height = 0.0, float range = 0.0, int type = 0)
+{
+	Event eHintStop = CreateEvent("instructor_server_hint_stop");
+	eHintStop.SetInt("hint_entindex", target);
+	eHintStop.Fire();
+	
+	Event eHintCreate = CreateEvent("instructor_server_hint_create");
+	eHintCreate.SetInt("userid", 0);
+	eHintCreate.SetInt("hint_entindex", target);
+	eHintCreate.SetInt("hint_target", target);
+	eHintCreate.SetInt("hint_flags", 0);
+	eHintCreate.SetInt("hint_display_limit", 0);
+	eHintCreate.SetInt("hint_allow_nodraw_t", 1);//advice arrow?
+	eHintCreate.SetInt("hint_nooffscreen", 0);
+	eHintCreate.SetInt("hint_forcecaption", 1);// no visible show?
+	eHintCreate.SetInt("hint_suppress_rest", 0);//cam?
+	eHintCreate.SetString("hint_caption", caption);
+	eHintCreate.SetString("hint_icon_onscreen", icon);
+	eHintCreate.SetString("hint_icon_offscreen", icon);
+	eHintCreate.SetString("hint_binding", binding);
+	eHintCreate.SetString("hint_color", color);
+	eHintCreate.SetInt("hint_timeout", timeout);
+	eHintCreate.SetFloat("hint_icon_offset", height);
+	eHintCreate.SetFloat("hint_range", range);
+	eHintCreate.SetInt("hint_instance_type", type);//0 : Multiple, 1 : Single Open (Prevents new hints from opening.), 2 : Fixed Replace (Ends other hints when a new one is shown.) ,3 : Single Active (Hides other hints when a new one is shown.)
+	eHintCreate.Fire();
+}
 
 public Action Timer_instructor_hint(Handle timer, int iEntity)
 {
